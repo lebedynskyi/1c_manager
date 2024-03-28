@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">1С Заказы</string>
+    <string name="authorization">Авторизация</string>
+    <string name="login">Имя пользователя</string>
+    <string name="password">Пароль</string>
+    <string name="log_in">Войти</string>
+    <string name="orders">Заказы</string>
+    <string name="main">Главная</string>
+    <string name="drafts">Черновики</string>
+    <string name="history">Обработанные</string>
+    <string name="no_orders">Нет Заказов</string>
+    <string name="create_order">Создать заказ</string>
+    <string name="customer">Заказчик</string>
+    <string name="gods">Товары:</string>
+    <string name="gods_title">Товары</string>
+    <string name="no_gods">Нет добавленных товаров.</string>
+    <string name="add_god">Добавить товар</string>
+    <string name="delivery_address">Адресс доставки</string>
+    <string name="delivery_time">Дата доставки</string>
+    <string name="filter">Поиск по категории</string>
+    <string name="god_info">Детали товара</string>
+</resources>

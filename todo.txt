@@ -1,0 +1,6 @@
+god info - back should lead to gods list
+god info - discard dialog
+god info - add discard dialog
+
+gods list - hide all button / hide empty folders with default hide empty
+gods list - search with folder path
