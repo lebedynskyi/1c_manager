@@ -27,7 +27,7 @@ class MainViewModel @Inject constructor() : AppViewModel<MainViewState>(
 
     private fun handleOnGodsClick() = launch {
         navigate {
-            toGods()
+            toGodsSelection()
         }
     }
 }

@@ -90,7 +90,8 @@ class CreateOrderViewModel @Inject constructor(
         navigate { toBack() }
     }
 
-    private fun handleAddGods() = launch {
-        navigate { toGods() }
+    private fun handleAddGods() = launch {state ->
+        val customerKey = state.selectedCustomer?.refKey ?: return@launch
+        navigate { toGodsSelection(customerKey) }
     }
 }

@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -75,8 +76,10 @@ fun GodsSelectionScreen(
             filterQuery = state.filterQuery,
             godsList = state.godsList,
             modifier = Modifier.padding(it),
+            showAll = state.showAll,
             onQueryChanged = { onUIEvent(GodsSelectionUIEvent.OnFilterQueryChanged(it)) },
-            onGodsClicked = { onUIEvent(GodsSelectionUIEvent.OnGodsClicked(it)) }
+            onGodsClicked = { onUIEvent(GodsSelectionUIEvent.OnGodsClicked(it)) },
+            onShowAllChanged = {onUIEvent(GodsSelectionUIEvent.OnShowAllToggleChanged(it))}
         )
         HorizontalDivider(modifier = Modifier.padding(it), thickness = 0.5.dp)
     }
@@ -87,9 +90,11 @@ fun GodsSelectionScreenContent(
     contentInProgress: Boolean,
     godsList: List<TreeNode>,
     filterQuery: String,
+    showAll: Boolean = false,
     modifier: Modifier = Modifier,
     onQueryChanged: (String) -> Unit,
     onGodsClicked: (TreeNode) -> Unit,
+    onShowAllChanged:(Boolean) -> Unit,
 ) {
     var refreshTrigger by remember { mutableIntStateOf(0) }
     val scrollState = rememberLazyListState()
@@ -99,31 +104,47 @@ fun GodsSelectionScreenContent(
         isContentInProgress = contentInProgress,
         modifier = modifier
     ) {
-        OutlinedTextField(
-            placeholder = {
-                Text(text = stringResource(id = R.string.filter))
-            },
-            modifier = Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
-            value = filterQuery, onValueChange = onQueryChanged
-        )
+        Column(Modifier.fillMaxSize()) {
+            OutlinedTextField(
+                placeholder = {
+                    Text(text = stringResource(id = R.string.filter))
+                },
+                modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth(),
+                value = filterQuery, onValueChange = onQueryChanged
+            )
+            HorizontalDivider(thickness = 0.5.dp)
 
-        LazyColumn(
-            modifier = Modifier
-                .padding(top = OutlinedTextFieldDefaults.MinHeight)
-                .padding(top = 8.dp)
-                .fillMaxSize()
-                .verticalScrollbar(scrollState),
-            state = scrollState
-        ) {
-            for (t in godsList) {
-                TreeBranch(t) {
-                    if (it.content.isFolder) {
-                        it.expanded = !it.expanded
-                        refreshTrigger = refreshTrigger.inc()
-                    } else {
-                        onGodsClicked(it)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(start = 12.dp)
+                        .weight(1F),
+                    text = "Показать ВСЕ"
+                )
+                Switch(modifier = Modifier.padding(horizontal = 12.dp),
+                    checked = showAll, onCheckedChange = {
+                        onShowAllChanged(it)
+                    })
+            }
+            HorizontalDivider(thickness = 0.5.dp)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScrollbar(scrollState),
+                state = scrollState
+            ) {
+                for (t in godsList) {
+                    TreeBranch(t) {
+                        if (it.content.isFolder) {
+                            it.expanded = !it.expanded
+                            refreshTrigger = refreshTrigger.inc()
+                        } else {
+                            onGodsClicked(it)
+                        }
                     }
                 }
             }

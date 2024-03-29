@@ -54,9 +54,15 @@ fun GodInfoScreen(
         }
     ) {
         GodInfoScreenContent(
+            state.amount.orEmpty(),
+            state.price.orEmpty(),
+            state.addBtnEnabled,
             state.godsData,
             state.orderHistory,
-            modifier = Modifier.padding(it)
+            modifier = Modifier.padding(it),
+            onAmountChanged = { onUIEvent(GodInfoUIEvent.OnAmountChanged(it)) },
+            onPriceChanged = { onUIEvent(GodInfoUIEvent.OnPriceChanged(it)) },
+            onAddClicked = { onUIEvent(GodInfoUIEvent.OnAddClick) }
         )
     }
 
@@ -65,19 +71,24 @@ fun GodInfoScreen(
 
 @Composable
 fun GodInfoScreenContent(
+    amount: String,
+    price: String,
+    addBtnEnabled: Boolean,
     godsData: GodsData?,
     orderHistory: List<Pair<String, GodOrderData>>?,
-    modifier: Modifier
+    modifier: Modifier = Modifier,
+    onAmountChanged: (String) -> Unit = {},
+    onPriceChanged: (String) -> Unit = {},
+    onAddClicked: () -> Unit = {}
 ) {
     if (godsData == null) {
         return
     }
 
-    var amount by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
-
     Box(
-        modifier = modifier.padding(horizontal = 12.dp).padding(bottom = 24.dp),
+        modifier = modifier
+            .padding(horizontal = 12.dp)
+            .padding(bottom = 24.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
         Column(
@@ -124,7 +135,7 @@ fun GodInfoScreenContent(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     value = amount,
                     onValueChange = {
-                        amount = it
+                        onAmountChanged(it)
                     })
             }
 
@@ -138,7 +149,7 @@ fun GodInfoScreenContent(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.weight(1f),
                     value = price, onValueChange = {
-                        price = it
+                        onPriceChanged(it)
                     })
 
             }
@@ -153,12 +164,13 @@ fun GodInfoScreenContent(
                         text = date.substring(0, 10)
                     )
 
-                    Text(text = "${god.price} грн (${god.sum} грн / ${god.amount})")
+                    Text(text = "${god.price} грн (${god.sum} грн / ${god.amount}${godsData.measure?.name})")
                 }
             }
         }
         Button(modifier = Modifier.fillMaxWidth(),
-            onClick = { /*TODO*/ }) {
+            enabled = addBtnEnabled,
+            onClick = { onAddClicked() }) {
             Text(
                 modifier = Modifier.padding(6.dp),
                 text = "Добавить"

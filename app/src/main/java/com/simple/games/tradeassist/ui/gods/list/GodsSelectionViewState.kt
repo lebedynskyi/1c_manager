@@ -5,6 +5,7 @@ import com.simple.games.tradeassist.ui.base.AppViewState
 data class GodsSelectionViewState(
     override var contentInProgress: Boolean = false,
     var filterQuery: String = "",
-    var godsList: List<TreeNode> = emptyList()
+    var godsList: List<TreeNode> = emptyList(),
+    var showAll: Boolean = false
 ) : AppViewState() {
 }

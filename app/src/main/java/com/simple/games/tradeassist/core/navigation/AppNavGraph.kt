@@ -82,7 +82,8 @@ fun NavGraphBuilder.applicationListNavGraph(
         val state by viewModel.viewState.collectAsState()
 
         LaunchedEffect(key1 = Unit) {
-            viewModel.onUIEvent(GodsSelectionUIEvent.OnScreenLoaded)
+            val customerKey = controller.getArgument<String>(AppRoute.GodsSelectionRoute.customerKey) ?: return@LaunchedEffect
+            viewModel.onUIEvent(GodsSelectionUIEvent.OnScreenLoaded(customerKey))
         }
 
         GodsSelectionScreen(state, onUIEvent = viewModel::onUIEvent)

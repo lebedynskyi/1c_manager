@@ -1,6 +1,13 @@
-god info - back should lead to gods list
-god info - discard dialog
-god info - add discard dialog
+PRICE???
 
-gods list - hide all button / hide empty folders with default hide empty
+god info - pass result with input data
+
+gods list - display selected god with price and amount?
 gods list - search with folder path
+gods list - Done BTN ?
+Gods list - collaps BTN
+
+God info - discard dialog
+Create order discard dialog
+
+Error handling

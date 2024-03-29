@@ -6,6 +6,7 @@ import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.ui.base.AppViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,36 +19,56 @@ class GodsSelectionViewModel @Inject constructor(
     private var loadedGods: List<GodsData> = emptyList()
     private var filteredTree: List<TreeNode> = emptyList()
     private var fullTree: List<TreeNode> = emptyList()
+    private var customerKey: String? = null
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
             is AppUIEvent.OnBackClicked -> handleBackClicked()
-            is GodsSelectionUIEvent.OnScreenLoaded -> handleScreenLoaded()
+            is GodsSelectionUIEvent.OnScreenLoaded -> handleScreenLoaded(event.customerKey)
+            is GodsSelectionUIEvent.OnShowAllToggleChanged -> handleShowAllToggle(event.showAll)
             is GodsSelectionUIEvent.OnGodsClicked -> handleGodsClicked(event.node)
         }
         super.onUIEvent(event)
     }
 
-    private fun handleScreenLoaded() = launch {
+    private fun handleShowAllToggle(isFullMode: Boolean) = launch {
+        if (isFullMode && fullTree.isEmpty()) return@launch
+        if (!isFullMode && filteredTree.isEmpty()) return@launch
+
+        reduce {
+            godsList = if (isFullMode) fullTree else filteredTree
+            showAll = isFullMode
+        }
+    }
+
+    private fun handleScreenLoaded(customerKey: String) = launch {
+        if (loadedGods.isNotEmpty()) {
+            return@launch
+        }
+
+        this.customerKey = customerKey
         reduce {
             contentInProgress = true
         }
         repository.getGods().onSuccess {
             loadedGods = it
-            val godsTree = buildTree(it, )
+            filteredTree = buildTree(it, fullMode = false)
             reduce {
-                godsList = godsTree
+                godsList = filteredTree
             }
         }
 
         reduce {
             contentInProgress = false
         }
+
+        delay(500)
+        fullTree = buildTree(loadedGods, fullMode = true)
     }
 
-    private fun handleGodsClicked(node: TreeNode) = launch{
+    private fun handleGodsClicked(node: TreeNode) = launch {
         navigate {
-            toBack(listOf(AppRoute.GodsSelectionRoute.resultSelectedGodKey to node.content.refKey))
+            toGodsInfo(customerKey, node.content.refKey)
         }
     }
 
@@ -57,11 +78,14 @@ class GodsSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun buildTree(gods: List<GodsData>): List<TreeNode> {
+    private fun buildTree(gods: List<GodsData>, fullMode: Boolean): List<TreeNode> {
         val nodeMap = mutableMapOf<String, TreeNode>()
 
         // Create nodes and populate the map
         for (god in gods) {
+            if (!fullMode && !god.isFolder && god.amount == 0F) {
+                continue
+            }
             val node = TreeNode(god)
             nodeMap[god.refKey] = node
         }
@@ -76,7 +100,7 @@ class GodsSelectionViewModel @Inject constructor(
         }
 
         // Identify root nodes (nodes with no parents)
-        val roots = mutableListOf<TreeNode>()
+        var roots = mutableListOf<TreeNode>()
         for ((_, node) in nodeMap) {
             if (gods.none { it.refKey == node.content.refKey } || node.content.parentKey == "00000000-0000-0000-0000-000000000000") {
                 sortTreeNode(node)
@@ -85,11 +109,44 @@ class GodsSelectionViewModel @Inject constructor(
         }
 
         roots.sortWith(compareBy({ !it.content.isFolder }, { it.content.description?.lowercase() }))
+
+        if (!fullMode) {
+            filterWithFiles(roots)
+        }
+
         return roots
     }
 
+    private fun filterWithFiles(nodes: List<TreeNode>){
+        nodes.forEach {
+            if (it.content.isFolder) {
+                it.children = it.children.filter { hasFile(it) }.toMutableList()
+                filterWithFiles(it.children)
+            }
+        }
+    }
+
+    private fun hasFile(node: TreeNode): Boolean {
+        var hasFiles = false
+        if (node.content.isFolder) {
+            node.children.forEach {
+                hasFiles = hasFiles || hasFile(it)
+                if (hasFiles) {
+                    return true
+                }
+            }
+        } else {
+            hasFiles = true
+        }
+        return hasFiles
+    }
+
     private fun sortTreeNode(root: TreeNode): TreeNode {
-        root.children.sortWith(compareBy({ !it.content.isFolder }, { it.content.description?.lowercase() }))
+        root.children.sortWith(
+            compareBy(
+                { !it.content.isFolder },
+                { it.content.description?.lowercase() })
+        )
         root.children.forEach { sortTreeNode(it) }
         return root
     }

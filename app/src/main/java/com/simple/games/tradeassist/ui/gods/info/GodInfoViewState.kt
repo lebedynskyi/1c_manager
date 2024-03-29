@@ -7,5 +7,10 @@ import com.simple.games.tradeassist.ui.base.AppViewState
 data class GodInfoViewState(
     override var requestInProgress: Boolean = false,
     var godsData: GodsData? = null,
-    var orderHistory: List<Pair<String, GodOrderData>>? = null
+    var orderHistory: List<Pair<String, GodOrderData>>? = null,
+    var addBtnEnabled: Boolean = false,
+    var amount: String? = null,
+    var amountError: Boolean = false,
+    var price: String? = null,
+    var priceError: Boolean = false
 ) : AppViewState()

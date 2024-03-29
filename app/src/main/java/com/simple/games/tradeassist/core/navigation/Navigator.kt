@@ -36,7 +36,8 @@ class Navigator @Inject constructor() {
         }
     }
 
-    fun toGods() {
+    fun toGodsSelection(customerKey: String? = null) {
+        controller?.putArgument(AppRoute.GodsSelectionRoute.customerKey, customerKey)
         controller?.navigate(AppRoute.GodsSelectionRoute.route)
     }
 
