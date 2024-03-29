@@ -28,17 +28,17 @@ class CreateOrderViewModel @Inject constructor(
             is CreateOrderUIEvent.OnCustomerNameChange -> handleCustomerNameChange(event.name)
             is CreateOrderUIEvent.OnDismissCustomerDropDown -> handleDismissCustomerDropDown()
             is CreateOrderUIEvent.OnCustomerSelected -> handleCustomerSelected(event.customer)
-            is CreateOrderUIEvent.OnGodSelected -> handleGodAdded(event.resultGodKey)
+//            is CreateOrderUIEvent.OnGodSelected -> handleGodAdded(event.resultGodKey)
         }
 
         super.onUIEvent(event)
     }
 
-    private fun handleGodAdded(godRefKey: String) = launch { state ->
-        val customerRefKey = state.selectedCustomer?.refKey ?: return@launch
+    private fun handleOrderAdded(godRefKey: String) = launch { state ->
+        val customer = state.selectedCustomer?: return@launch
 
         navigate {
-            toGodsInfo(customerRefKey, godRefKey)
+//            toGodsInfo(customer, godRefKey)
         }
     }
 

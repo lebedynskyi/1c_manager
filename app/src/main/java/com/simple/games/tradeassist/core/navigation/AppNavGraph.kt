@@ -7,6 +7,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.simple.games.tradeassist.data.api.response.CustomerData
+import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.ui.gods.info.GodInfoScreen
 import com.simple.games.tradeassist.ui.gods.info.GodInfoUIEvent
 import com.simple.games.tradeassist.ui.gods.info.GodInfoViewModel
@@ -68,10 +70,10 @@ fun NavGraphBuilder.applicationListNavGraph(
         LaunchedEffect(key1 = Unit) {
             viewModel.onUIEvent(CreateOrderUIEvent.OnScreenLoaded)
 
-            val selectedGodResult = controller.getResult<String>(AppRoute.GodsSelectionRoute.resultSelectedGodKey)
-            selectedGodResult?.let {
-                viewModel.onUIEvent(CreateOrderUIEvent.OnGodSelected(it))
-            }
+//            val selectedGodResult = controller.getResult<String>(AppRoute.GodsSelectionRoute.resultSelectedGodKey)
+//            selectedGodResult?.let {
+//                viewModel.onUIEvent(CreateOrderUIEvent.OnGodSelected(it))
+//            }
         }
 
         CreateOrderScreen(state, onUIEvent = viewModel::onUIEvent)
@@ -94,11 +96,17 @@ fun NavGraphBuilder.applicationListNavGraph(
         val state by viewModel.viewState.collectAsState()
 
         LaunchedEffect(key1 = Unit) {
-            val customerKey = controller.getArgument<String>(AppRoute.GodsInfoRoute.customerKey) ?: return@LaunchedEffect
-            val godKey = controller.getArgument<String>(AppRoute.GodsInfoRoute.godsKey) ?: return@LaunchedEffect
-            viewModel.onUIEvent(GodInfoUIEvent.OnScreenLoaded(customerKey, godKey))
+            val customer = controller.getArgument<CustomerData>(AppRoute.GodsInfoRoute.argCustomer) ?: return@LaunchedEffect
+            val god = controller.getArgument<GodsData>(AppRoute.GodsInfoRoute.argGods) ?: return@LaunchedEffect
+            viewModel.onUIEvent(GodInfoUIEvent.OnScreenLoaded(customer, god))
         }
 
         GodInfoScreen(state, onUIEvent = viewModel::onUIEvent)
+        checkNavigation(state.navRoute)
+    }
+
+
+    private fun checkNavigation(approute) {
+
     }
 }

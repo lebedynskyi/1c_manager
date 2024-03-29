@@ -1,8 +1,11 @@
 package com.simple.games.tradeassist.ui.gods.info
 
 import com.simple.games.dexter.ui.base.AppUIEvent
+import com.simple.games.tradeassist.data.api.response.CustomerData
+import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.ui.base.AppViewModel
+import com.simple.games.tradeassist.ui.gods.GodOrderModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -12,13 +15,13 @@ class GodInfoViewModel @Inject constructor(
 ) : AppViewModel<GodInfoViewState>(GodInfoViewState()) {
     override val viewStateCopy: GodInfoViewState get() = viewState.value.copy()
 
-    private var currentCustomer: String? = null
+    private var currentCustomer: CustomerData? = null
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
             is AppUIEvent.OnBackClicked -> handleBackClicked()
 
-            is GodInfoUIEvent.OnScreenLoaded -> handleScreenLoaded(event.customerKey, event.godKey)
+            is GodInfoUIEvent.OnScreenLoaded -> handleScreenLoaded(event.customer, event.god)
             is GodInfoUIEvent.OnAddClick -> handleOnAddGods()
             is GodInfoUIEvent.OnAmountChanged -> handleAmountChanged(event.amount)
             is GodInfoUIEvent.OnPriceChanged -> handlePriceChanged(event.price)
@@ -29,7 +32,7 @@ class GodInfoViewModel @Inject constructor(
     private fun handleOnAddGods() = launch { state ->
         val amount = state.amount?.toFloatOrNull() ?: return@launch
         val price = state.price?.toFloatOrNull() ?: return@launch
-
+        val orderModel = GodOrderModel(amount, price)
         navigate {
             toBack()
         }
@@ -57,13 +60,13 @@ class GodInfoViewModel @Inject constructor(
         }
     }
 
-    private fun handlePriceChanged(priceInput: String) {
+    private fun handlePriceChanged(priceInput: String) = launch {
         if (priceInput.isBlank()) {
             reduce {
                 priceError = false
                 addBtnEnabled = false
             }
-            return
+            return@launch
         }
 
         val price = priceInput.toFloatOrNull()
@@ -79,18 +82,18 @@ class GodInfoViewModel @Inject constructor(
         }
     }
 
-    private fun handleScreenLoaded(customerKey: String?, godKey: String) = launch {
-        currentCustomer = customerKey
+    private fun handleScreenLoaded(customer: CustomerData?, god: GodsData) = launch {
+        currentCustomer = customer
         reduce { requestInProgress = true }
 
-        c1Repository.getGod(godKey).onSuccess {
+        c1Repository.getGod(god.refKey).onSuccess {
             reduce {
                 godsData = it
             }
         }
 
-        customerKey?.let {
-            c1Repository.getOrderHistory(customerKey, godKey)
+        customer?.let {
+            c1Repository.getOrderHistory(customer.refKey, god.refKey)
                 .onSuccess {
                     reduce {
                         orderHistory = if (it.size > 7) it.subList(0, 6) else it
@@ -101,9 +104,7 @@ class GodInfoViewModel @Inject constructor(
         reduce { requestInProgress = false }
     }
 
-    private fun handleBackClicked() = launch {
-        navigate {
-            toBack()
-        }
+    private fun handleBackClicked() {
+        navigator.toBack()
     }
 }

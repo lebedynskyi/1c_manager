@@ -21,11 +21,7 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class MainApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-    }
-}
+class MainApp : Application()
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

@@ -20,6 +20,9 @@ class MainViewModel @Inject constructor() : AppViewModel<MainViewState>(
     }
 
     private fun handleOrdersClick() = launch {
+        reduce {
+            navRoute = Orderroute(someArgs)
+        }
         navigate {
             toOrders()
         }

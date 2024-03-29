@@ -1,7 +1,6 @@
 package com.simple.games.tradeassist.ui.gods.list
 
 import com.simple.games.dexter.ui.base.AppUIEvent
-import com.simple.games.tradeassist.core.navigation.AppRoute
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.ui.base.AppViewModel
@@ -12,8 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GodsSelectionViewModel @Inject constructor(
     private val repository: C1Repository
-) :
-    AppViewModel<GodsSelectionViewState>(GodsSelectionViewState(contentInProgress = true)) {
+) : AppViewModel<GodsSelectionViewState>(GodsSelectionViewState(contentInProgress = true)) {
     override val viewStateCopy: GodsSelectionViewState get() = viewState.value.copy()
 
     private var loadedGods: List<GodsData> = emptyList()

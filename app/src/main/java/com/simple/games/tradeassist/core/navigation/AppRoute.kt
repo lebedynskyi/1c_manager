@@ -22,8 +22,8 @@ sealed class AppRoute {
 
     object GodsInfoRoute {
         val route = "GodsInfo"
-        val godsKey = "GodsInfoGodsKey"
-        val customerKey = "GodsInfoCustomerKey"
+        val argGods = "GodsInfoGodsKey"
+        val argCustomer = "GodsInfoCustomerKey"
 
         val resultCustomerKey = "GodsInfoResultCustomerKey"
         val resultGodKey = "GodsInfoResultGodKey"
