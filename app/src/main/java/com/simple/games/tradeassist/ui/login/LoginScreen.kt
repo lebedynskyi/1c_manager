@@ -27,7 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.simple.games.dexter.ui.base.AppUIEvent
+import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.R
 import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
@@ -72,7 +72,8 @@ private fun LoginForm(
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 24.dp).padding(top = 24.dp)
+            .padding(horizontal = 24.dp)
+            .padding(top = 24.dp)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

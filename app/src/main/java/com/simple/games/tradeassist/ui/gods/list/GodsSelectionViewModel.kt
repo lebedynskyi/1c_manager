@@ -1,9 +1,12 @@
 package com.simple.games.tradeassist.ui.gods.list
 
-import com.simple.games.dexter.ui.base.AppUIEvent
+import com.simple.games.tradeassist.core.navigation.AppRoute
+import com.simple.games.tradeassist.ui.base.AppUIEvent
+import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.ui.base.AppViewModel
+import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import javax.inject.Inject
@@ -17,14 +20,19 @@ class GodsSelectionViewModel @Inject constructor(
     private var loadedGods: List<GodsData> = emptyList()
     private var filteredTree: List<TreeNode> = emptyList()
     private var fullTree: List<TreeNode> = emptyList()
-    private var customerKey: String? = null
+    private var customer: CustomerData? = null
+
+    private val orders = mutableListOf<GodOrderTemplate>()
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
             is AppUIEvent.OnBackClicked -> handleBackClicked()
-            is GodsSelectionUIEvent.OnScreenLoaded -> handleScreenLoaded(event.customerKey)
+            is GodsSelectionUIEvent.OnScreenLoaded -> handleScreenLoaded(event.customer)
+            is GodsSelectionUIEvent.OnDoneClick -> handleDoneClicked()
+            is GodsSelectionUIEvent.OnCollapseClick -> handleCollapseClicked()
             is GodsSelectionUIEvent.OnShowAllToggleChanged -> handleShowAllToggle(event.showAll)
             is GodsSelectionUIEvent.OnGodsClicked -> handleGodsClicked(event.node)
+            is GodsSelectionUIEvent.OnAddGodOrder -> handleGodOrderAdded(event.order)
         }
         super.onUIEvent(event)
     }
@@ -39,12 +47,28 @@ class GodsSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun handleScreenLoaded(customerKey: String) = launch {
+    private fun handleDoneClicked() = launch {
+        navigate {
+            toBack(AppRoute.GodsSelectionRoute.resultSelectedGods to orders)
+        }
+    }
+
+    private fun handleCollapseClicked() = launch { state ->
+        val collapsedTree = buildList {
+            addAll(collapseAll(state.godsList))
+        }
+
+        reduce {
+            godsList = collapsedTree
+        }
+    }
+
+    private fun handleScreenLoaded(customer: CustomerData?) = launch {
         if (loadedGods.isNotEmpty()) {
             return@launch
         }
 
-        this.customerKey = customerKey
+        this.customer = customer
         reduce {
             contentInProgress = true
         }
@@ -64,9 +88,20 @@ class GodsSelectionViewModel @Inject constructor(
         fullTree = buildTree(loadedGods, fullMode = true)
     }
 
+    private fun handleGodOrderAdded(orderTemplate: GodOrderTemplate) {
+        orders.add(orderTemplate)
+        reduce {
+            this.orderTemplates = mutableListOf<GodOrderTemplate>().apply {
+                orders.forEach {
+                    add(it)
+                }
+            }
+        }
+    }
+
     private fun handleGodsClicked(node: TreeNode) = launch {
         navigate {
-            toGodsInfo(customerKey, node.content.refKey)
+            toGodsInfo(customer, node.content)
         }
     }
 
@@ -98,7 +133,7 @@ class GodsSelectionViewModel @Inject constructor(
         }
 
         // Identify root nodes (nodes with no parents)
-        var roots = mutableListOf<TreeNode>()
+        val roots = mutableListOf<TreeNode>()
         for ((_, node) in nodeMap) {
             if (gods.none { it.refKey == node.content.refKey } || node.content.parentKey == "00000000-0000-0000-0000-000000000000") {
                 sortTreeNode(node)
@@ -115,7 +150,7 @@ class GodsSelectionViewModel @Inject constructor(
         return roots
     }
 
-    private fun filterWithFiles(nodes: List<TreeNode>){
+    private fun filterWithFiles(nodes: List<TreeNode>) {
         nodes.forEach {
             if (it.content.isFolder) {
                 it.children = it.children.filter { hasFile(it) }.toMutableList()
@@ -147,5 +182,11 @@ class GodsSelectionViewModel @Inject constructor(
         )
         root.children.forEach { sortTreeNode(it) }
         return root
+    }
+    private fun collapseAll(node: List<TreeNode> ): MutableList<TreeNode>{
+        val nodes = node.map {
+            it.copy(expanded = false, children = collapseAll(it.children))
+        }.toMutableList()
+        return nodes
     }
 }

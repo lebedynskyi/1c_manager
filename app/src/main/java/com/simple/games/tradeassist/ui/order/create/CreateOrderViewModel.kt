@@ -1,10 +1,10 @@
 package com.simple.games.tradeassist.ui.order.create
 
-import com.simple.games.dexter.ui.base.AppUIEvent
+import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.data.api.response.CustomerData
-import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.ui.base.AppViewModel
+import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -17,7 +17,7 @@ class CreateOrderViewModel @Inject constructor(
     override val viewStateCopy: CreateOrderViewState get() = viewState.value.copy()
 
     private val loadedCustomers: MutableList<CustomerData> = mutableListOf()
-    private val addedGods: MutableList<GodsData> = mutableListOf()
+    private val orderGods: MutableList<GodOrderTemplate> = mutableListOf()
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
@@ -28,17 +28,55 @@ class CreateOrderViewModel @Inject constructor(
             is CreateOrderUIEvent.OnCustomerNameChange -> handleCustomerNameChange(event.name)
             is CreateOrderUIEvent.OnDismissCustomerDropDown -> handleDismissCustomerDropDown()
             is CreateOrderUIEvent.OnCustomerSelected -> handleCustomerSelected(event.customer)
-//            is CreateOrderUIEvent.OnGodSelected -> handleGodAdded(event.resultGodKey)
+            is CreateOrderUIEvent.OnGodsAdded -> handleGodsAdded(event.gods)
+            is CreateOrderUIEvent.OnGodAdded -> handleGodAdded(event.god)
+            is CreateOrderUIEvent.OnGodRemoveClicked -> handleGodRemoved(event.god)
+            is CreateOrderUIEvent.OnGodEditClick -> handleGodEdit(event.god)
         }
 
         super.onUIEvent(event)
     }
+    private fun handleGodAdded(god: GodOrderTemplate) {
+        reduce {
+            orderTemplates = mutableListOf<GodOrderTemplate>().apply {
+                orderGods.forEach {
+                    if (it.godsData.refKey == god.godsData.refKey) {
+                        add(god)
+                    } else {
+                        add(it)
+                    }
+                }
+            }
+        }
+    }
 
-    private fun handleOrderAdded(godRefKey: String) = launch { state ->
-        val customer = state.selectedCustomer?: return@launch
+    private fun handleGodsAdded(gods: List<GodOrderTemplate>) = launch { state ->
+        orderGods.addAll(gods)
 
+        reduce {
+            orderTemplates = mutableListOf<GodOrderTemplate>().apply {
+                orderGods.forEach {
+                    add(it)
+                }
+            }
+        }
+    }
+
+    private fun handleGodRemoved(god: GodOrderTemplate) = launch {
+        orderGods.remove(god)
+        reduce {
+            orderTemplates = mutableListOf<GodOrderTemplate>().apply {
+                orderGods.forEach {
+                    add(it)
+                }
+            }
+        }
+    }
+
+    private fun handleGodEdit(order: GodOrderTemplate) = launch { state ->
+        val customer = state.selectedCustomer ?: return@launch
         navigate {
-//            toGodsInfo(customer, godRefKey)
+            toGodsInfo(customer, order.godsData, order.amount, order.price)
         }
     }
 
@@ -51,7 +89,7 @@ class CreateOrderViewModel @Inject constructor(
         }
     }
 
-    private fun handleDismissCustomerDropDown(){
+    private fun handleDismissCustomerDropDown() {
         reduce {
             filteredCustomers = emptyList()
         }
@@ -59,8 +97,8 @@ class CreateOrderViewModel @Inject constructor(
 
     private fun handleCustomerNameChange(name: String) {
         val filtered = if (name.isBlank()) {
-             emptyList()
-        }else {
+            emptyList()
+        } else {
             loadedCustomers.filter { it.description?.contains(name, true) == true }
         }
         reduce {
@@ -90,8 +128,8 @@ class CreateOrderViewModel @Inject constructor(
         navigate { toBack() }
     }
 
-    private fun handleAddGods() = launch {state ->
-        val customerKey = state.selectedCustomer?.refKey ?: return@launch
-        navigate { toGodsSelection(customerKey) }
+    private fun handleAddGods() = launch { state ->
+        val customer = state.selectedCustomer ?: return@launch
+        navigate { toGodsSelection(customer) }
     }
 }

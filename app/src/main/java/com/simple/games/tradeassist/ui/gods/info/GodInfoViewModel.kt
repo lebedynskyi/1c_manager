@@ -1,11 +1,12 @@
 package com.simple.games.tradeassist.ui.gods.info
 
-import com.simple.games.dexter.ui.base.AppUIEvent
+import com.simple.games.tradeassist.ui.base.AppUIEvent
+import com.simple.games.tradeassist.core.navigation.AppRoute
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.ui.base.AppViewModel
-import com.simple.games.tradeassist.ui.gods.GodOrderModel
+import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -16,12 +17,13 @@ class GodInfoViewModel @Inject constructor(
     override val viewStateCopy: GodInfoViewState get() = viewState.value.copy()
 
     private var currentCustomer: CustomerData? = null
+    private var currentGod: GodsData? = null
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
             is AppUIEvent.OnBackClicked -> handleBackClicked()
 
-            is GodInfoUIEvent.OnScreenLoaded -> handleScreenLoaded(event.customer, event.god)
+            is GodInfoUIEvent.OnScreenLoaded -> handleScreenLoaded(event.customer, event.god, event.price, event.amount)
             is GodInfoUIEvent.OnAddClick -> handleOnAddGods()
             is GodInfoUIEvent.OnAmountChanged -> handleAmountChanged(event.amount)
             is GodInfoUIEvent.OnPriceChanged -> handlePriceChanged(event.price)
@@ -32,63 +34,83 @@ class GodInfoViewModel @Inject constructor(
     private fun handleOnAddGods() = launch { state ->
         val amount = state.amount?.toFloatOrNull() ?: return@launch
         val price = state.price?.toFloatOrNull() ?: return@launch
-        val orderModel = GodOrderModel(amount, price)
+        val customer = currentCustomer ?: return@launch
+        val god = currentGod ?: return@launch
+
+        val orderModel = GodOrderTemplate(customer, god, amount, price)
         navigate {
-            toBack()
+            toBack(AppRoute.GodsInfoRoute.resultOrder to orderModel)
         }
     }
 
     private fun handleAmountChanged(amountInput: String) {
         if (amountInput.isBlank()) {
             reduce {
+                amount = amountInput
                 amountError = false
                 addBtnEnabled = false
             }
             return
         }
 
-        val amount = amountInput.toFloatOrNull()
-        if (amount == null) {
+        if (amountInput.toFloatOrNull() == null) {
             reduce {
                 amountError = true
+                amount = amountInput
                 addBtnEnabled = false
             }
         } else {
             reduce {
                 this.amount = amountInput
+                this.addBtnEnabled = !priceError && price?.isNotBlank() == true
             }
         }
     }
 
-    private fun handlePriceChanged(priceInput: String) = launch {
+    private fun handlePriceChanged(priceInput: String) {
         if (priceInput.isBlank()) {
             reduce {
+                price = priceInput
                 priceError = false
                 addBtnEnabled = false
             }
-            return@launch
+            return
         }
 
-        val price = priceInput.toFloatOrNull()
-        if (price == null) {
+        if (priceInput.toFloatOrNull() == null) {
             reduce {
+                this.price = priceInput
                 priceError = true
                 addBtnEnabled = false
             }
         } else {
             reduce {
                 this.price = priceInput
+                this.addBtnEnabled = !amountError && amount?.isNotBlank() == true
             }
         }
     }
 
-    private fun handleScreenLoaded(customer: CustomerData?, god: GodsData) = launch {
+    private fun handleScreenLoaded(
+        customer: CustomerData?,
+        god: GodsData,
+        price: Float?,
+        amount: Float?
+    ) = launch {
         currentCustomer = customer
+        currentGod = god
+
         reduce { requestInProgress = true }
 
         c1Repository.getGod(god.refKey).onSuccess {
             reduce {
                 godsData = it
+                price?.let {
+                    this.price = it.toString()
+                }
+                amount?.let {
+                    this.amount = it.toString()
+                }
             }
         }
 

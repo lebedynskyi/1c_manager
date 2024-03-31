@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.simple.games.dexter.ui.base.AppUIEvent
+import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.R
 import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
@@ -33,7 +33,7 @@ fun OrdersScreen(
     Scaffold(
         topBar = {
             Column(Modifier.fillMaxWidth()) {
-                AppTopBar(title = R.string.orders, leftIcon = R.drawable.ic_arrow_back, onLeftIconClick = {
+                AppTopBar(title = R.string.orders, navigationIcon = R.drawable.ic_arrow_back, onNavigationClick = {
                     onUIEvent(AppUIEvent.OnBackClicked)
                 })
                 HorizontalDivider(thickness = 0.5.dp)

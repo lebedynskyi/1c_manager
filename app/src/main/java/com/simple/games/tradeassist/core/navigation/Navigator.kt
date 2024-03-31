@@ -23,8 +23,8 @@ class Navigator @Inject constructor() {
         this.activity = null
     }
 
-    fun toBack(result: List<Pair<String, Any>>? = null) {
-        result?.forEach { (key, value) ->
+    fun toBack(vararg result: Pair<String, Any>) {
+        result.forEach { (key, value) ->
             controller?.putResult(key, value)
         }
         controller?.popBackStack()
@@ -38,14 +38,16 @@ class Navigator @Inject constructor() {
         }
     }
 
-    fun toGodsSelection(customerKey: String? = null) {
-        controller?.putArgument(AppRoute.GodsSelectionRoute.customerKey, customerKey)
+    fun toGodsSelection(customer: CustomerData? = null) {
+        controller?.putArgument(AppRoute.GodsSelectionRoute.argCustomer, customer)
         controller?.navigate(AppRoute.GodsSelectionRoute.route)
     }
 
-    fun toGodsInfo(customer: CustomerData?, god: GodsData) {
+    fun toGodsInfo(customer: CustomerData?, god: GodsData, amount: Float? = null, price: Float? = null) {
         controller?.putArgument(AppRoute.GodsInfoRoute.argGods, god)
         controller?.putArgument(AppRoute.GodsInfoRoute.argCustomer, customer)
+        controller?.putArgument(AppRoute.GodsInfoRoute.argAmount, amount)
+        controller?.putArgument(AppRoute.GodsInfoRoute.argPrice, price)
         controller?.navigate(AppRoute.GodsInfoRoute.route)
     }
 

@@ -3,7 +3,6 @@ package com.simple.games.tradeassist.ui.base
 import androidx.annotation.CallSuper
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simple.games.dexter.ui.base.AppUIEvent
 import com.simple.games.tradeassist.core.navigation.Navigator
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

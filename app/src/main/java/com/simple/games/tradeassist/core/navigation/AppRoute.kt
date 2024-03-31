@@ -15,20 +15,19 @@ sealed class AppRoute {
 
     object GodsSelectionRoute {
         val route = "GodsSelection"
-        val resultSelectedGodKey = "GodsSelectionResultGodKey"
-        val customerKey = "GodsSelectionResultCustomerKey"
+        val resultSelectedGods = "GodsSelectionResultGodKey"
+        val argCustomer = "GodsSelectionResultCustomer"
 
     }
 
     object GodsInfoRoute {
-        val route = "GodsInfo"
+        val route = "GodsInfoRoute"
         val argGods = "GodsInfoGodsKey"
         val argCustomer = "GodsInfoCustomerKey"
+        val argAmount = "GodsInfoAmount"
+        val argPrice = "GodsInfoPrice"
 
-        val resultCustomerKey = "GodsInfoResultCustomerKey"
-        val resultGodKey = "GodsInfoResultGodKey"
-        val resultAmount = "GodsInfoResultAmount"
-        val resultPrice = "GodsInfoResultPrice"
+        val resultOrder = "GodsInfoResultOrder"
     }
 
     object CreateOrder {

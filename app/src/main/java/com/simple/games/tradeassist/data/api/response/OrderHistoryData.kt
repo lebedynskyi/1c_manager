@@ -34,5 +34,5 @@ class GodOrderData {
     var sum: Float? = null
 
     @Transient
-    var meadure: MeasureData? = null
+    var measure: MeasureData? = null
 }

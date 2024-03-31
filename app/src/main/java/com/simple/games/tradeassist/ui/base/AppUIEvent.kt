@@ -1,4 +1,4 @@
-package com.simple.games.dexter.ui.base
+package com.simple.games.tradeassist.ui.base
 
 abstract class AppUIEvent {
     override fun toString(): String {

@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
+import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import com.simple.games.tradeassist.ui.gods.info.GodInfoScreen
 import com.simple.games.tradeassist.ui.gods.info.GodInfoUIEvent
 import com.simple.games.tradeassist.ui.gods.info.GodInfoViewModel
@@ -70,10 +71,13 @@ fun NavGraphBuilder.applicationListNavGraph(
         LaunchedEffect(key1 = Unit) {
             viewModel.onUIEvent(CreateOrderUIEvent.OnScreenLoaded)
 
-//            val selectedGodResult = controller.getResult<String>(AppRoute.GodsSelectionRoute.resultSelectedGodKey)
-//            selectedGodResult?.let {
-//                viewModel.onUIEvent(CreateOrderUIEvent.OnGodSelected(it))
-//            }
+            controller.getResult<List<GodOrderTemplate>>(AppRoute.GodsSelectionRoute.resultSelectedGods)?.let {
+                viewModel.onUIEvent(CreateOrderUIEvent.OnGodsAdded(it))
+            }
+
+            controller.getResult<GodOrderTemplate>(AppRoute.GodsInfoRoute.resultOrder)?.let {
+                viewModel.onUIEvent(CreateOrderUIEvent.OnGodAdded(it))
+            }
         }
 
         CreateOrderScreen(state, onUIEvent = viewModel::onUIEvent)
@@ -84,8 +88,12 @@ fun NavGraphBuilder.applicationListNavGraph(
         val state by viewModel.viewState.collectAsState()
 
         LaunchedEffect(key1 = Unit) {
-            val customerKey = controller.getArgument<String>(AppRoute.GodsSelectionRoute.customerKey) ?: return@LaunchedEffect
-            viewModel.onUIEvent(GodsSelectionUIEvent.OnScreenLoaded(customerKey))
+            val customer = controller.getArgument<CustomerData?>(AppRoute.GodsSelectionRoute.argCustomer)
+            viewModel.onUIEvent(GodsSelectionUIEvent.OnScreenLoaded(customer))
+
+            controller.getResult<GodOrderTemplate>(AppRoute.GodsInfoRoute.resultOrder)?.let {
+                viewModel.onUIEvent(GodsSelectionUIEvent.OnAddGodOrder(it))
+            }
         }
 
         GodsSelectionScreen(state, onUIEvent = viewModel::onUIEvent)
@@ -98,15 +106,11 @@ fun NavGraphBuilder.applicationListNavGraph(
         LaunchedEffect(key1 = Unit) {
             val customer = controller.getArgument<CustomerData>(AppRoute.GodsInfoRoute.argCustomer) ?: return@LaunchedEffect
             val god = controller.getArgument<GodsData>(AppRoute.GodsInfoRoute.argGods) ?: return@LaunchedEffect
-            viewModel.onUIEvent(GodInfoUIEvent.OnScreenLoaded(customer, god))
+            val price = controller.getArgument<Float?>(AppRoute.GodsInfoRoute.argPrice)
+            val amount = controller.getArgument<Float?>(AppRoute.GodsInfoRoute.argAmount)
+            viewModel.onUIEvent(GodInfoUIEvent.OnScreenLoaded(customer, god, price, amount))
         }
 
         GodInfoScreen(state, onUIEvent = viewModel::onUIEvent)
-        checkNavigation(state.navRoute)
-    }
-
-
-    private fun checkNavigation(approute) {
-
     }
 }

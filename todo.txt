@@ -1,11 +1,7 @@
 PRICE???
 
-god info - pass result with input data
-
-gods list - display selected god with price and amount?
 gods list - search with folder path
-gods list - Done BTN ?
-Gods list - collaps BTN
+gods list = argument of already added gods
 
 God info - discard dialog
 Create order discard dialog

@@ -1,6 +1,6 @@
 package com.simple.games.tradeassist.ui.main
 
-import com.simple.games.dexter.ui.base.AppUIEvent
+import com.simple.games.tradeassist.ui.base.AppUIEvent
 
 sealed class MainUIEvent : AppUIEvent() {
     data object OnScreenLoaded : MainUIEvent()

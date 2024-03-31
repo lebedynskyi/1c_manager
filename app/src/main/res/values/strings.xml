@@ -9,7 +9,8 @@
     <string name="drafts">Черновики</string>
     <string name="history">Обработанные</string>
     <string name="no_orders">Нет Заказов</string>
-    <string name="create_order">Создать заказ</string>
+    <string name="create_order">Создание заказа</string>
+    <string name="edit_order">Редактирование заказ</string>
     <string name="customer">Заказчик</string>
     <string name="gods">Товары:</string>
     <string name="gods_title">Товары</string>
@@ -17,6 +18,8 @@
     <string name="add_god">Добавить товар</string>
     <string name="delivery_address">Адресс доставки</string>
     <string name="delivery_time">Дата доставки</string>
-    <string name="filter">Поиск по категории</string>
+    <string name="filter">Поиск товаров</string>
     <string name="god_info">Детали товара</string>
+    <string name="delete_order_template">Удалить товар</string>
+    <string name="edit_order_template">Редактировать</string>
 </resources>

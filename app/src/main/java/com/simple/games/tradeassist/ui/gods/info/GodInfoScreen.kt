@@ -1,6 +1,7 @@
 package com.simple.games.tradeassist.ui.gods.info
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.Expand
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
@@ -21,10 +24,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -32,7 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.simple.games.dexter.ui.base.AppUIEvent
+import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.R
 import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.data.api.response.MeasureData
@@ -40,21 +39,35 @@ import com.simple.games.tradeassist.data.api.response.GodOrderData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
+import com.simple.games.tradeassist.ui.gods.list.GodsSelectionUIEvent
 
 @Composable
 fun GodInfoScreen(
-    state: GodInfoViewState,
-    onUIEvent: (AppUIEvent) -> Unit = {}
+    state: GodInfoViewState, onUIEvent: (AppUIEvent) -> Unit = {}
 ) {
-    Scaffold(
-        topBar = {
-            AppTopBar(title = R.string.god_info, leftIcon = R.drawable.ic_arrow_back) {
+    Scaffold(topBar = {
+        AppTopBar(title = R.string.god_info,
+            navigationIcon = R.drawable.ic_arrow_back,
+            onNavigationClick = {
                 onUIEvent(AppUIEvent.OnBackClicked)
-            }
-        }
-    ) {
-        GodInfoScreenContent(
-            state.amount.orEmpty(),
+            },
+            menus = {
+                if (state.addBtnEnabled) {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clickable { onUIEvent(GodInfoUIEvent.OnAddClick) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = rememberVectorPainter(image = Icons.Outlined.Done),
+                            contentDescription = null
+                        )
+                    }
+                }
+            })
+    }) {
+        GodInfoScreenContent(state.amount.orEmpty(),
             state.price.orEmpty(),
             state.addBtnEnabled,
             state.godsData,
@@ -62,8 +75,7 @@ fun GodInfoScreen(
             modifier = Modifier.padding(it),
             onAmountChanged = { onUIEvent(GodInfoUIEvent.OnAmountChanged(it)) },
             onPriceChanged = { onUIEvent(GodInfoUIEvent.OnPriceChanged(it)) },
-            onAddClicked = { onUIEvent(GodInfoUIEvent.OnAddClick) }
-        )
+            onAddClicked = { onUIEvent(GodInfoUIEvent.OnAddClick) })
     }
 
     ContentLoadingIndicator(show = state.requestInProgress)
@@ -129,8 +141,7 @@ fun GodInfoScreenContent(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(text = "Колличесство:", modifier = Modifier.weight(3F))
-                OutlinedTextField(
-                    modifier = Modifier.weight(1f),
+                OutlinedTextField(modifier = Modifier.weight(1f),
                     maxLines = 1,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     value = amount,
@@ -145,23 +156,22 @@ fun GodInfoScreenContent(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(text = "Цена покупки: ", modifier = Modifier.weight(3F))
-                OutlinedTextField(
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                OutlinedTextField(keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.weight(1f),
-                    value = price, onValueChange = {
+                    value = price,
+                    onValueChange = {
                         onPriceChanged(it)
                     })
 
             }
 
             HorizontalDivider(thickness = 0.5.dp)
-            Text(text = "История ФОП Стас Артомонов центральный рынок")
+            Text(text = "История покупок:")
 
             for ((date, god) in orderHistory.orEmpty()) {
                 Row {
                     Text(
-                        modifier = Modifier.weight(1F),
-                        text = date.substring(0, 10)
+                        modifier = Modifier.weight(1F), text = date.substring(0, 10)
                     )
 
                     Text(text = "${god.price} грн (${god.sum} грн / ${god.amount}${godsData.measure?.name})")
@@ -172,8 +182,7 @@ fun GodInfoScreenContent(
             enabled = addBtnEnabled,
             onClick = { onAddClicked() }) {
             Text(
-                modifier = Modifier.padding(6.dp),
-                text = "Добавить"
+                modifier = Modifier.padding(6.dp), text = "Добавить"
             )
         }
     }
@@ -183,31 +192,28 @@ fun GodInfoScreenContent(
 @Composable
 fun GodInfoScreenPreview() {
     TradeAssistTheme {
-        GodInfoScreen(state = GodInfoViewState(
-            godsData = GodsData().apply {
-                amount = 123F
-                measure = MeasureData().apply { this.name = "м" }
-                description =
-                    "Длинное название товара для стройки и заметания двора. Супер дупер тряпк швабра. Ну очень длинно енвазиние"
-            },
-            orderHistory = buildList {
-                add("2024-03-28 16:57:09" to GodOrderData().apply {
-                    price = 22F
-                    amount = 133
-                    sum = 12333.0F
-                })
+        GodInfoScreen(state = GodInfoViewState(godsData = GodsData().apply {
+            amount = 123F
+            measure = MeasureData().apply { this.name = "м" }
+            description =
+                "Длинное название товара для стройки и заметания двора. Супер дупер тряпк швабра. Ну очень длинно енвазиние"
+        }, orderHistory = buildList {
+            add("2024-03-28 16:57:09" to GodOrderData().apply {
+                price = 22F
+                amount = 133
+                sum = 12333.0F
+            })
 
-                add("2024-03-28 16:57:09" to GodOrderData().apply {
-                    price = 22F
-                    amount = 133
-                    sum = 12333.0F
-                })
-                add("2024-03-28 16:57:09" to GodOrderData().apply {
-                    price = 22F
-                    amount = 133
-                    sum = 12333.0F
-                })
-            }
-        ))
+            add("2024-03-28 16:57:09" to GodOrderData().apply {
+                price = 22F
+                amount = 133
+                sum = 12333.0F
+            })
+            add("2024-03-28 16:57:09" to GodOrderData().apply {
+                price = 22F
+                amount = 133
+                sum = 12333.0F
+            })
+        }))
     }
 }

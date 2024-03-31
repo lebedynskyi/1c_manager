@@ -7,6 +7,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -26,29 +27,31 @@ import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 @Composable
 fun AppTopBar(
     @StringRes title: Int,
-    @DrawableRes leftIcon: Int? = null,
-    onLeftIconClick: (() -> Unit)? = null
+    @DrawableRes navigationIcon: Int? = null,
+    onNavigationClick: (() -> Unit)? = null,
+    menus: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
         title = {
             Text(text = stringResource(title))
         },
         navigationIcon = {
-            if (leftIcon != null) {
+            if (navigationIcon != null) {
                 Box(modifier = Modifier
                     .size(48.dp)
                     .clickable {
-                        onLeftIconClick?.invoke()
+                        onNavigationClick?.invoke()
                     }, contentAlignment = Alignment.Center) {
                     Image(
                         colorFilter = ColorFilter.tint(TopAppBarDefaults.topAppBarColors().titleContentColor),
 
-                        painter = painterResource(id = leftIcon),
+                        painter = painterResource(id = navigationIcon),
                         contentDescription = null
                     )
                 }
             }
-        }
+        },
+        actions = menus
     )
 }
 

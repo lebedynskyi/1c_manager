@@ -1,6 +1,6 @@
 package com.simple.games.tradeassist.ui.login
 
-import com.simple.games.dexter.ui.base.AppUIEvent
+import com.simple.games.tradeassist.ui.base.AppUIEvent
 
 sealed class LoginUIEvent : AppUIEvent() {
     object OnScreenLoaded : LoginUIEvent()

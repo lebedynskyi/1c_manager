@@ -1,6 +1,6 @@
 package com.simple.games.tradeassist.ui.main
 
-import com.simple.games.dexter.ui.base.AppUIEvent
+import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.ui.base.AppViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -12,7 +12,7 @@ class MainViewModel @Inject constructor() : AppViewModel<MainViewState>(
     override val viewStateCopy: MainViewState get() = viewState.value.copy()
 
     override fun onUIEvent(event: AppUIEvent) {
-        when(event){
+        when (event) {
             MainUIEvent.OnOrderClick -> handleOrdersClick()
             MainUIEvent.OnGodsClick -> handleOnGodsClick()
         }
@@ -20,9 +20,6 @@ class MainViewModel @Inject constructor() : AppViewModel<MainViewState>(
     }
 
     private fun handleOrdersClick() = launch {
-        reduce {
-            navRoute = Orderroute(someArgs)
-        }
         navigate {
             toOrders()
         }

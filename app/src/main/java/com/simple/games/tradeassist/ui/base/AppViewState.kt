@@ -4,5 +4,4 @@ abstract class AppViewState {
     open var contentInProgress: Boolean = false
     open var refreshInProgress: Boolean = false
     open var requestInProgress: Boolean = false
-    navigationRoute:
 }

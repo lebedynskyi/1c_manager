@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class GodsData {
+class GodsData : java.io.Serializable {
     @SerialName("Ref_Key")
     lateinit var refKey: String
 
@@ -30,6 +30,18 @@ class GodsData {
     var amount: Float = 0F
     @kotlinx.serialization.Transient
     var measure: MeasureData? = null
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as GodsData
+
+        return refKey == other.refKey
+    }
+
+    override fun hashCode(): Int {
+        return refKey.hashCode()
+    }
 }
 
 /**
