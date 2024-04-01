@@ -7,6 +7,7 @@ import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 sealed class CreateOrderUIEvent : AppUIEvent() {
     data object OnScreenLoaded: CreateOrderUIEvent()
     object OnAddGods: CreateOrderUIEvent()
+    object Publish: CreateOrderUIEvent()
     object OnDismissCustomerDropDown: CreateOrderUIEvent()
     data class OnGodsAdded(val gods: List<GodOrderTemplate>): CreateOrderUIEvent()
     data class OnGodAdded(val god: GodOrderTemplate): CreateOrderUIEvent()

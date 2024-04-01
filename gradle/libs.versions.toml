@@ -21,13 +21,18 @@ kotlinCoroutines = "1.7.3"
 javaInject = "1"
 coil = "2.6.0"
 retrofit = "2.9.0"
+room = "2.6.1"
 retrofitJsonSerializer = "0.8.0"
 retrofitLogger = "5.0.0-alpha.10"
 kotlinSerialization = "1.6.3"
 
 firebasePlugin = "4.4.1"
 
+
 [libraries]
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

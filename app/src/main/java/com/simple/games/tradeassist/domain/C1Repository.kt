@@ -2,11 +2,13 @@ package com.simple.games.tradeassist.domain
 
 import com.simple.games.tradeassist.data.api.C1ApiDataSource
 import com.simple.games.tradeassist.data.api.response.CustomerData
+import com.simple.games.tradeassist.data.api.response.EmptyResponse
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.GodOrderData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.OrderHistoryData
 import com.simple.games.tradeassist.data.api.response.StorageData
+import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import java.lang.IllegalArgumentException
@@ -74,6 +76,17 @@ class C1Repository @Inject constructor(
                 }
             }.reversed()
         }
+    }
+
+    private suspend fun saveOrder(template: GodOrderTemplate) {
+
+    }
+
+    suspend fun publishOrder(
+        customerKey: String,
+        gods: List<GodOrderTemplate>
+    ): Result<EmptyResponse> {
+        return apiDataSource.publishOrder(customerKey, gods)
     }
 
     suspend fun getCustomers(): Result<List<CustomerData>> {

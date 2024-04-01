@@ -10,6 +10,7 @@ data class GodOrderTemplate(
     val godsData: GodsData,
     val amount: Float,
     val price: Float,
+    val sum: Float = price * amount
 ) : java.io.Serializable {
 
     override fun equals(other: Any?): Boolean {

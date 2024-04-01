@@ -73,6 +73,7 @@ fun CreateOrderScreen(
             gods = state.orderTemplates,
             modifier = Modifier.padding(it),
             onAddGods = { onUIEvent(CreateOrderUIEvent.OnAddGods) },
+            onPublishOrder = { onUIEvent(CreateOrderUIEvent.Publish) },
             onCustomerNameChanged = remember {
                 {
                     onUIEvent(
@@ -102,6 +103,7 @@ fun CreateOrderScreenContent(
     customers: List<CustomerData>,
     modifier: Modifier = Modifier,
     onAddGods: () -> Unit,
+    onPublishOrder: () -> Unit,
     onCustomerNameChanged: (String) -> Unit,
     onDismissDropDown: () -> Unit,
     onCustomerSelected: (CustomerData) -> Unit,
@@ -266,11 +268,19 @@ fun CreateOrderScreenContent(
 
                 item {
                     Button(
-
                         modifier = Modifier.fillMaxWidth(),
                         enabled = addGodsEnabled,
                         onClick = { onAddGods() }) {
                         Text(text = stringResource(id = R.string.add_god))
+                    }
+                }
+
+                item {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = addGodsEnabled,
+                        onClick = { onPublishOrder() }) {
+                        Text(text = "Опубликовать")
                     }
                 }
             }

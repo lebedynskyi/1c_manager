@@ -14,7 +14,7 @@ class LoginViewModel @Inject constructor(
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
-//            is LoginUIEvent.OnScreenLoaded -> handleLoginSubmitted("стас", "1989")
+            is LoginUIEvent.OnScreenLoaded -> handleLoginSubmitted("стас", "1989")
             is LoginUIEvent.OnLoginSubmit -> handleLoginSubmitted(event.login, event.pass)
         }
 

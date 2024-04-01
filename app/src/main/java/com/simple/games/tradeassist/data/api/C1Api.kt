@@ -1,5 +1,6 @@
 package com.simple.games.tradeassist.data.api
 
+import com.simple.games.tradeassist.data.api.request.RequestPublishOrder
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.DataResponse
@@ -8,8 +9,10 @@ import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.OrderHistoryData
 import com.simple.games.tradeassist.data.api.response.StorageData
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface C1Api {
@@ -33,4 +36,10 @@ interface C1Api {
         @Header("Authorization") auth: String?,
         @Query("\$filter") customerFilter: String
     ): Response<DataResponse<OrderHistoryData>>
+
+    @POST("Document_ЗаказПокупателя?\$format=json")
+    suspend fun publishOrder(
+        @Header("Authorization") auth: String?,
+        @Body request: RequestPublishOrder
+    ): Response<EmptyResponse>
 }

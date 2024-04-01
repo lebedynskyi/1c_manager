@@ -32,10 +32,12 @@ class CreateOrderViewModel @Inject constructor(
             is CreateOrderUIEvent.OnGodAdded -> handleGodAdded(event.god)
             is CreateOrderUIEvent.OnGodRemoveClicked -> handleGodRemoved(event.god)
             is CreateOrderUIEvent.OnGodEditClick -> handleGodEdit(event.god)
+            is CreateOrderUIEvent.Publish -> handlePublish()
         }
 
         super.onUIEvent(event)
     }
+
     private fun handleGodAdded(god: GodOrderTemplate) {
         reduce {
             orderTemplates = mutableListOf<GodOrderTemplate>().apply {
@@ -47,6 +49,17 @@ class CreateOrderViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun handlePublish() = launch { state ->
+        val customer = state.selectedCustomer ?: return@launch
+        val gods = state.orderTemplates ?: return@launch
+        repository.publishOrder(customerKey = customer.refKey, gods).onSuccess {
+            System.err.println("SUCCES!!!")
+        }.onFailure {
+            System.err.println("FAIL!!!!!!")
+            it.printStackTrace()
         }
     }
 
