@@ -6,15 +6,15 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Entity(tableName = "measure")
 @Serializable
-class MeasureData {
-    @ColumnInfo("refKey")
+@Entity("responsible")
+class ResponsibleData {
     @PrimaryKey
     @SerialName("Ref_Key")
+    @ColumnInfo("refKey")
     lateinit var refKey: String
 
-    @ColumnInfo("internationalName")
-    @SerialName("МеждународноеСокращение")
+    @ColumnInfo("name")
+    @SerialName("Description")
     var name: String? = null
 }

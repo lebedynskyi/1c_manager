@@ -1,9 +1,11 @@
 package com.simple.games.tradeassist.core.di
 
 import android.content.Context
+import androidx.room.Room
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.simple.games.tradeassist.data.AndroidNetworkStateDataSource
 import com.simple.games.tradeassist.data.api.C1Api
+import com.simple.games.tradeassist.data.db.DataBase
 import com.simple.games.tradeassist.domain.NetworkStateDataSource
 import dagger.Module
 import dagger.Provides
@@ -26,6 +28,14 @@ import java.util.concurrent.TimeUnit
 @Module
 @InstallIn(SingletonComponent::class)
 class DataModule {
+    @Provides
+    fun provideRoomDb(@ApplicationContext applicationContext: Context): DataBase {
+        return Room.databaseBuilder(
+            applicationContext,
+            DataBase::class.java, "trade-assist.db"
+        ).build()
+    }
+
     @Provides
     fun provideRestRetrofit(
         httpClient: OkHttpClient,
@@ -59,7 +69,7 @@ class DataModule {
         httpClientBuilder.readTimeout(0, TimeUnit.SECONDS)
         httpClientBuilder.writeTimeout(0, TimeUnit.SECONDS)
         val loggerInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = HttpLoggingInterceptor.Level.HEADERS
         }
         httpClientBuilder.addInterceptor(loggerInterceptor)
         return httpClientBuilder.build()

@@ -7,3 +7,6 @@ God info - discard dialog
 Create order discard dialog
 
 Error handling
+
+Вопрос СТАСУ!
+Как различать визуально какой из кабелей в заказе если одно и тоже имя в разных папках ? или это уже не важно?

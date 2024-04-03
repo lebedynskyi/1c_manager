@@ -2,7 +2,6 @@
 
 package com.simple.games.tradeassist.ui.order.create
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -33,10 +31,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +42,8 @@ import com.simple.games.tradeassist.R
 import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
+import com.simple.games.tradeassist.data.api.response.MeasureData
+import com.simple.games.tradeassist.domain.GodEntity
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
@@ -53,12 +51,12 @@ import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 @Composable
 fun CreateOrderScreen(
     state: CreateOrderViewState,
-    onUIEvent: (AppUIEvent) -> Unit
+    onUIEvent: (AppUIEvent) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             AppTopBar(
-                title = R.string.create_order,
+                title = R.string.creation_order,
                 navigationIcon = R.drawable.ic_arrow_back,
                 onNavigationClick = {
                     onUIEvent(AppUIEvent.OnBackClicked)
@@ -73,7 +71,7 @@ fun CreateOrderScreen(
             gods = state.orderTemplates,
             modifier = Modifier.padding(it),
             onAddGods = { onUIEvent(CreateOrderUIEvent.OnAddGods) },
-            onPublishOrder = { onUIEvent(CreateOrderUIEvent.Publish) },
+            onSaveOrder = { onUIEvent(CreateOrderUIEvent.SaveOrder) },
             onCustomerNameChanged = remember {
                 {
                     onUIEvent(
@@ -103,7 +101,7 @@ fun CreateOrderScreenContent(
     customers: List<CustomerData>,
     modifier: Modifier = Modifier,
     onAddGods: () -> Unit,
-    onPublishOrder: () -> Unit,
+    onSaveOrder: () -> Unit,
     onCustomerNameChanged: (String) -> Unit,
     onDismissDropDown: () -> Unit,
     onCustomerSelected: (CustomerData) -> Unit,
@@ -198,7 +196,7 @@ fun CreateOrderScreenContent(
                 item {
                     Text(text = stringResource(id = R.string.gods))
                 }
-                items(gods.size, key = { gods[it].godsData.refKey }) { index ->
+                items(gods.size, key = { gods[it].godEntity.data.refKey }) { index ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
@@ -206,7 +204,7 @@ fun CreateOrderScreenContent(
                         Column(modifier = Modifier.padding(12.dp)) {
                             val god = gods[index]
                             Text(
-                                text = god.godsData.description.orEmpty(),
+                                text = god.godEntity.data.description.orEmpty(),
                                 style = MaterialTheme.typography.titleLarge
                             )
                             HorizontalDivider(thickness = 0.5.dp)
@@ -218,7 +216,7 @@ fun CreateOrderScreenContent(
                                 Text(
                                     modifier = Modifier.padding(12.dp),
                                     textAlign = TextAlign.Center,
-                                    text = "${god.amount} ${god.godsData.measure?.name}",
+                                    text = "${god.amount} ${god.godEntity.measureData?.name}",
                                 )
                             }
 
@@ -232,6 +230,19 @@ fun CreateOrderScreenContent(
                                     modifier = Modifier.padding(12.dp),
                                     textAlign = TextAlign.Center,
                                     text = "${god.price} грн",
+                                )
+                            }
+
+                            HorizontalDivider(thickness = 0.5.dp)
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(text = "Вся сумма: ", modifier = Modifier.weight(3F))
+                                Text(
+                                    modifier = Modifier.padding(12.dp),
+                                    textAlign = TextAlign.Center,
+                                    text = "${god.sum} грн",
                                 )
                             }
 
@@ -279,8 +290,8 @@ fun CreateOrderScreenContent(
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         enabled = addGodsEnabled,
-                        onClick = { onPublishOrder() }) {
-                        Text(text = "Опубликовать")
+                        onClick = { onSaveOrder() }) {
+                        Text(text = "Сохранить заказ")
                     }
                 }
             }
@@ -296,19 +307,22 @@ fun PreviewCreateOrder() {
         CreateOrderScreen(
             state = CreateOrderViewState(
                 orderTemplates = buildList {
-                    add(GodOrderTemplate(CustomerData(), GodsData().apply {
-                        refKey = "122"
-                        description = "Кабель 2х234"
-                    }, 2F, 6F))
-
-                    add(GodOrderTemplate(CustomerData(), GodsData().apply {
-                        refKey = "123"
-                        description = "Кабель ЩВВП длинное описание 300 на 500 мметров 0.5"
-                    }, 2F, 6F))
+                    add(
+                        GodOrderTemplate(
+                            CustomerData(), GodEntity(
+                                data = GodsData().apply {
+                                    refKey = "122"
+                                    description = "Кабель 2х234"
+                                },
+                                measureData = MeasureData().apply {
+                                    name = "шт"
+                                }, price = 2F, availableAmount = 6F
+                            ),
+                            amount = 213F, price = 12313F
+                        )
+                    )
                 }
             )
-        ) {
-
-        }
+        )
     }
 }

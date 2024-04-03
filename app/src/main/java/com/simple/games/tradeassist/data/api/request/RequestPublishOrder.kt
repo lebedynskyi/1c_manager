@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RequestPublishOrder(
-    @SerialName("Ответственный_Key")
-    val orderResponsibleKey: String = "994612b7-1331-11ee-8c17-982cbc31dbf6",
     @SerialName("Контрагент_Key")
     val customerKey: String,
+    @SerialName("Ответственный_Key")
+    val orderResponsibleKey: String,
     @SerialName("Date")
     val date: String, //  = "2024-04-01T12:44:57"
     @SerialName("ДатаОтгрузки")

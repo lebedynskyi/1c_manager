@@ -1,35 +1,44 @@
 package com.simple.games.tradeassist.data.api.response
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
+@Entity("gods")
 class GodsData : java.io.Serializable {
+    @PrimaryKey
+    @ColumnInfo("refKey")
     @SerialName("Ref_Key")
     lateinit var refKey: String
 
+    @ColumnInfo("parentKey")
     @SerialName("Parent_Key")
     var parentKey: String? = null
 
+    @ColumnInfo("imageFileKey")
     @SerialName("ФайлКартинки_Key")
     var imageKey: String? = null
 
+    @ColumnInfo("measureKey")
     @SerialName("ЕдиницаИзмерения_Key")
     var measureKey: String? = null
 
+    @ColumnInfo("isFolder")
     @SerialName("IsFolder")
     var isFolder: Boolean = false
 
+    @ColumnInfo("code")
     @SerialName("Code")
     var code: String? = null
 
+    @ColumnInfo("description")
     @SerialName("Description")
     var description: String? = null
 
-    @kotlinx.serialization.Transient
-    var amount: Float = 0F
-    @kotlinx.serialization.Transient
-    var measure: MeasureData? = null
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -43,63 +52,3 @@ class GodsData : java.io.Serializable {
         return refKey.hashCode()
     }
 }
-
-/**
- * Ref_Key": "0395b8f1-1332-11ee-8c17-982cbc31dbf6",
- *             "DataVersion": "AAAB9QAAAAA=",
- *             "DeletionMark": false,
- *             "Parent_Key": "0013adb0-289b-11ee-8c1f-982cbc31dbf6",
- *             "IsFolder": true,
- *             "Code": "ФР-00000001",
- *             "Description": "кабель",
- *             "Артикул": null,
- *             "ВидАлкогольнойПродукции_Key": null,
- *             "ДатаИзменения": "2023-07-22T17:42:45",
- *             "ЕдиницаИзмерения_Key": null,
- *             "ИмпортнаяАлкогольнаяПродукция": null,
- *             "ИспользоватьПартии": null,
- *             "ИспользоватьХарактеристики": null,
- *             "Комментарий": null,
- *             "МетодОценки": null,
- *             "НаименованиеПолное": null,
- *             "НаправлениеДеятельности_Key": null,
- *             "КатегорияНоменклатуры_Key": null,
- *             "НормаВремени": null,
- *             "ОбъемДАЛ": null,
- *             "Поставщик_Key": null,
- *             "ПроизводительИмпортерАлкогольнойПродукции_Key": null,
- *             "Склад_Key": null,
- *             "Спецификация_Key": null,
- *             "СпособПополнения": null,
- *             "СрокИсполненияЗаказа": null,
- *             "СрокПополнения": null,
- *             "СтавкаНДС_Key": null,
- *             "СтранаПроисхождения_Key": null,
- *             "СчетУчетаЗапасов_Key": null,
- *             "СчетУчетаЗатрат_Key": null,
- *             "ТипНоменклатуры": null,
- *             "УдалитьВидАлкогольнойПродукции_Key": null,
- *             "УдалитьИмпортнаяАлкогольнаяПродукция": null,
- *             "УдалитьОбъемДАЛ": null,
- *             "УдалитьПроизводительИмпортерАлкогольнойПродукции_Key": null,
- *             "ФайлКартинки_Key": null,
- *             "ФиксированнаяСтоимость": null,
- *             "ЦеноваяГруппа_Key": null,
- *             "Ячейка_Key": null,
- *             "РекомендуемЗаказать": null,
- *             "ИсключитьИзПрайсЛистов": null,
- *             "ЭтоНовинка": null,
- *             "НижняяГраницаОстатков": null,
- *             "ВерхняяГраницаОстатков": null,
- *             "СрокДействияФлагаНовинка": null,
- *             "ТранспортнаяУслуга": null,
- *             "НоменклатураГТД_Key": null,
- *             "ПодакцизныйТовар": null,
- *             "СтатьяДекларацииПоАкцизномуНалогу_Key": null,
- *             "ЛьготаНДС": null,
- *             "КодЛьготы": null,
- *             "ДополнительныеРеквизиты": [],
- *             "Predefined": false,
- *             "PredefinedDataName": "",
- *             "Parent@navigationLinkUrl": "Catalog_Номенклатура(guid'0395b8f1-1332-11ee-8c17-982cbc31dbf6')/Parent"
- * */

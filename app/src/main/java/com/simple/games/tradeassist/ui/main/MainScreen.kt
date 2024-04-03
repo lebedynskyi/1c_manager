@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.R
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
+import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
 
 @Composable
 fun MainScreen(
@@ -32,6 +33,8 @@ fun MainScreen(
             onGodsClick = { onUIEvent(MainUIEvent.OnGodsClick) }
         )
     }
+
+    ContentLoadingIndicator(show = state.requestInProgress, "Загрузка базы данных 1С")
 }
 
 @Composable
@@ -47,14 +50,18 @@ fun MainScreenContent(
             .fillMaxWidth()
     ) {
         Button(
-            modifier = Modifier.fillMaxWidth().height(48.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
             onClick = { onOrderClick() }
         ) {
             Text(text = stringResource(R.string.orders))
         }
 
         Button(
-            modifier = Modifier.fillMaxWidth().height(48.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
             onClick = { onGodsClick() }
         ) {
             Text(text = stringResource(R.string.gods_title))

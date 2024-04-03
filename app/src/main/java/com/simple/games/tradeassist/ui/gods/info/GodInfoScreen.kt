@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Done
-import androidx.compose.material.icons.outlined.Expand
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
@@ -37,9 +36,9 @@ import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.GodOrderData
 import com.simple.games.tradeassist.data.api.response.GodsData
+import com.simple.games.tradeassist.domain.GodEntity
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
-import com.simple.games.tradeassist.ui.gods.list.GodsSelectionUIEvent
 
 @Composable
 fun GodInfoScreen(
@@ -70,7 +69,7 @@ fun GodInfoScreen(
         GodInfoScreenContent(state.amount.orEmpty(),
             state.price.orEmpty(),
             state.addBtnEnabled,
-            state.godsData,
+            state.godsEntity,
             state.orderHistory,
             modifier = Modifier.padding(it),
             onAmountChanged = { onUIEvent(GodInfoUIEvent.OnAmountChanged(it)) },
@@ -86,14 +85,14 @@ fun GodInfoScreenContent(
     amount: String,
     price: String,
     addBtnEnabled: Boolean,
-    godsData: GodsData?,
+    godEntity: GodEntity?,
     orderHistory: List<Pair<String, GodOrderData>>?,
     modifier: Modifier = Modifier,
     onAmountChanged: (String) -> Unit = {},
     onPriceChanged: (String) -> Unit = {},
     onAddClicked: () -> Unit = {}
 ) {
-    if (godsData == null) {
+    if (godEntity == null) {
         return
     }
 
@@ -124,14 +123,14 @@ fun GodInfoScreenContent(
                 Text(
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
-                    text = godsData.description.orEmpty()
+                    text = godEntity.data.description.orEmpty()
                 )
             }
 
             HorizontalDivider(thickness = 0.5.dp)
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(text = "На складе: ${godsData.amount}${godsData.measure?.name}")
+                Text(text = "На складе: ${godEntity.availableAmount}${godEntity.measureData?.name}")
                 Text(text = "Базовая цена: ???")
             }
 
@@ -174,7 +173,7 @@ fun GodInfoScreenContent(
                         modifier = Modifier.weight(1F), text = date.substring(0, 10)
                     )
 
-                    Text(text = "${god.price} грн (${god.sum} грн / ${god.amount}${godsData.measure?.name})")
+                    Text(text = "${god.price} грн (${god.sum} грн / ${god.amount}${godEntity.measureData?.name})")
                 }
             }
         }
@@ -192,28 +191,35 @@ fun GodInfoScreenContent(
 @Composable
 fun GodInfoScreenPreview() {
     TradeAssistTheme {
-        GodInfoScreen(state = GodInfoViewState(godsData = GodsData().apply {
-            amount = 123F
-            measure = MeasureData().apply { this.name = "м" }
-            description =
-                "Длинное название товара для стройки и заметания двора. Супер дупер тряпк швабра. Ну очень длинно енвазиние"
-        }, orderHistory = buildList {
-            add("2024-03-28 16:57:09" to GodOrderData().apply {
-                price = 22F
-                amount = 133
-                sum = 12333.0F
-            })
+        GodInfoScreen(
+            state = GodInfoViewState(godsEntity = GodEntity(
+                GodsData().apply {
+                    description =
+                        "Длинное название товара для стройки и заметания двора. Супер дупер тряпк швабра. Ну очень длинно енвазиние"
+                },
+                measureData = MeasureData().apply {
+                    name = "шт"
+                },
+                availableAmount = 123F,
+                price = 100500F
+            ), orderHistory = buildList {
+                add("2024-03-28 16:57:09" to GodOrderData().apply {
+                    price = 22F
+                    amount = 133
+                    sum = 12333.0F
+                })
 
-            add("2024-03-28 16:57:09" to GodOrderData().apply {
-                price = 22F
-                amount = 133
-                sum = 12333.0F
+                add("2024-03-28 16:57:09" to GodOrderData().apply {
+                    price = 22F
+                    amount = 133
+                    sum = 12333.0F
+                })
+                add("2024-03-28 16:57:09" to GodOrderData().apply {
+                    price = 22F
+                    amount = 133
+                    sum = 12333.0F
+                })
             })
-            add("2024-03-28 16:57:09" to GodOrderData().apply {
-                price = 22F
-                amount = 133
-                sum = 12333.0F
-            })
-        }))
+        )
     }
 }

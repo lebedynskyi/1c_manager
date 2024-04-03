@@ -5,6 +5,7 @@ import com.simple.games.tradeassist.core.navigation.AppRoute
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.domain.C1Repository
+import com.simple.games.tradeassist.domain.GodEntity
 import com.simple.games.tradeassist.ui.base.AppViewModel
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,7 @@ class GodInfoViewModel @Inject constructor(
     override val viewStateCopy: GodInfoViewState get() = viewState.value.copy()
 
     private var currentCustomer: CustomerData? = null
-    private var currentGod: GodsData? = null
+    private var currentGod: GodEntity? = null
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
@@ -93,7 +94,7 @@ class GodInfoViewModel @Inject constructor(
 
     private fun handleScreenLoaded(
         customer: CustomerData?,
-        god: GodsData,
+        god: GodEntity,
         price: Float?,
         amount: Float?
     ) = launch {
@@ -102,9 +103,9 @@ class GodInfoViewModel @Inject constructor(
 
         reduce { requestInProgress = true }
 
-        c1Repository.getGod(god.refKey).onSuccess {
+        c1Repository.getGod(god.data.refKey).onSuccess {
             reduce {
-                godsData = it
+                godsEntity = it
                 price?.let {
                     this.price = it.toString()
                 }
@@ -115,7 +116,7 @@ class GodInfoViewModel @Inject constructor(
         }
 
         customer?.let {
-            c1Repository.getOrderHistory(customer.refKey, god.refKey)
+            c1Repository.getOrderHistory(customer.refKey, god.data.refKey)
                 .onSuccess {
                     reduce {
                         orderHistory = if (it.size > 7) it.subList(0, 6) else it

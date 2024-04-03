@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
+import com.simple.games.tradeassist.domain.GodEntity
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import com.simple.games.tradeassist.ui.gods.info.GodInfoScreen
 import com.simple.games.tradeassist.ui.gods.info.GodInfoUIEvent
@@ -23,6 +24,7 @@ import com.simple.games.tradeassist.ui.main.MainScreen
 import com.simple.games.tradeassist.ui.main.MainUIEvent
 import com.simple.games.tradeassist.ui.main.MainViewModel
 import com.simple.games.tradeassist.ui.order.OrdersScreen
+import com.simple.games.tradeassist.ui.order.OrdersUIEvent
 import com.simple.games.tradeassist.ui.order.OrdersViewModel
 import com.simple.games.tradeassist.ui.order.create.CreateOrderScreen
 import com.simple.games.tradeassist.ui.order.create.CreateOrderUIEvent
@@ -58,7 +60,7 @@ fun NavGraphBuilder.applicationListNavGraph(
         val state by viewModel.viewState.collectAsState()
 
         LaunchedEffect(key1 = Unit) {
-            viewModel.onUIEvent(MainUIEvent.OnScreenLoaded)
+            viewModel.onUIEvent(OrdersUIEvent.OnScreenLoaded)
         }
 
         OrdersScreen(state, onUIEvent = viewModel::onUIEvent)
@@ -105,7 +107,7 @@ fun NavGraphBuilder.applicationListNavGraph(
 
         LaunchedEffect(key1 = Unit) {
             val customer = controller.getArgument<CustomerData>(AppRoute.GodsInfoRoute.argCustomer) ?: return@LaunchedEffect
-            val god = controller.getArgument<GodsData>(AppRoute.GodsInfoRoute.argGods) ?: return@LaunchedEffect
+            val god = controller.getArgument<GodEntity>(AppRoute.GodsInfoRoute.argGods) ?: return@LaunchedEffect
             val price = controller.getArgument<Float?>(AppRoute.GodsInfoRoute.argPrice)
             val amount = controller.getArgument<Float?>(AppRoute.GodsInfoRoute.argAmount)
             viewModel.onUIEvent(GodInfoUIEvent.OnScreenLoaded(customer, god, price, amount))

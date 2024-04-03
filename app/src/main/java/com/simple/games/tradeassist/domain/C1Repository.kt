@@ -7,64 +7,87 @@ import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.GodOrderData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.OrderHistoryData
-import com.simple.games.tradeassist.data.api.response.StorageData
+import com.simple.games.tradeassist.data.api.response.ResponsibleData
+import com.simple.games.tradeassist.data.api.response.StorageRecordData
+import com.simple.games.tradeassist.data.db.DataBase
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
-import java.lang.IllegalArgumentException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class C1Repository @Inject constructor(
     private val apiDataSource: C1ApiDataSource,
-    private val dispatcher: CoroutineDispatcher
+    private val dataBase: DataBase,
+    dispatcher: CoroutineDispatcher
 ) : CoroutineAware(dispatcher) {
-    private val cachedGods: MutableList<GodsData> = mutableListOf()
-    private val cachedCustomers: MutableList<CustomerData> = mutableListOf()
-    private val cachedStorage: MutableList<StorageData> = mutableListOf()
-    private val cachedMeasure: MutableList<MeasureData> = mutableListOf()
+    suspend fun login(user: String, pass: String): Result<EmptyResponse> {
+        return apiDataSource.login(user, pass)
+    }
 
-    private var godsJob: Job? = null
-    private var customerJob: Job? = null
-    private var storageJob: Job? = null
-    private var measureJob: Job? = null
+    suspend fun hasData(): Boolean {
+        return dataBase.customersDao().getCount() > 0 &&
+                dataBase.measureDao().getCount() > 0 &&
+                dataBase.godsDao().getCount() > 0 &&
+                dataBase.storageDao().getCount() > 0 &&
+                dataBase.responsibleDao().getCount() > 0
+    }
 
-    suspend fun login(user: String, pass: String): Result<Boolean> {
-        return apiDataSource.login(user, pass).map { true }.onSuccess {
-            godsJob = launch { syncGods() }
-            storageJob = launch { syncStorage() }
-            measureJob = launch { syncMeasure() }
-            customerJob = launch { syncCustomers() }
+    suspend fun syncData(): Result<Boolean> {
+        return fetchCustomers().onSuccess {
+            dataBase.customersDao().insertAll(it)
+        }.chain { fetchResponsible() }.onSuccess {
+            dataBase.responsibleDao().insertAll(it)
+        }.chain { fetchMeasure() }.onSuccess {
+            dataBase.measureDao().insertAll(it)
+        }.chain { fetchStorage() }.onSuccess {
+            dataBase.storageDao().insertAll(it)
+        }.chain { fetchGods() }.onSuccess {
+            dataBase.godsDao().insertAll(it)
+        }.map {
+            true
         }
     }
 
-    suspend fun getGods(): Result<List<GodsData>> {
-        godsJob?.join()
-        return syncGods()
-    }
+    // TODO calculate price? WTF to do
+    suspend fun getGods(): Result<List<GodEntity>> {
+        val measures = dataBase.measureDao().getAll()
+        val storage = dataBase.storageDao().getAll().groupBy { it.godKey }
+        val gods = dataBase.godsDao().getAll()
 
-    suspend fun getGod(refKey: String): Result<GodsData> {
-        godsJob?.join()
-        return syncGods().chain {
-            val required = it.firstOrNull { it.refKey == refKey }
-            if (required == null) {
-                Result.failure(IllegalArgumentException())
-            } else {
-                Result.success(required)
+        val result = buildList {
+            for (g in gods) {
+                val godMeasure = measures.firstOrNull { it.refKey == g.measureKey }
+                val godStorage = storage[g.refKey] ?: emptyList()
+                add(GodEntity(g, godMeasure, 0F, calculateAmount(godStorage)))
             }
         }
+
+        return Result.success(result)
+    }
+
+    suspend fun getGod(refKey: String): Result<GodEntity?> {
+        val measures = dataBase.measureDao().getAll()
+        val storage = dataBase.storageDao().getAll().groupBy { it.godKey }
+        val god = dataBase.godsDao().get(refKey) ?: return Result.success(null)
+
+        val godMeasure = measures.firstOrNull { it.refKey == god.measureKey }
+        val godStorage = storage[god.refKey] ?: emptyList()
+        val result = GodEntity(god, godMeasure, 0F, calculateAmount(godStorage))
+
+        return Result.success(result)
+    }
+
+    suspend fun getCustomers(): Result<List<CustomerData>> {
+        return Result.success(dataBase.customersDao().getAll())
     }
 
     suspend fun getOrderHistory(customerKey: String): Result<List<OrderHistoryData>> {
-        return apiDataSource.getOrderHistory(customerKey).map {
-            it.data
-        }
+        return apiDataSource.getOrderHistory(customerKey)
     }
 
     suspend fun getOrderHistory(
-        customerKey: String,
-        godKey: String
+        customerKey: String, godKey: String
     ): Result<List<Pair<String, GodOrderData>>> {
         return getOrderHistory(customerKey).map {
             buildList {
@@ -78,106 +101,77 @@ class C1Repository @Inject constructor(
         }
     }
 
-    private suspend fun saveOrder(template: GodOrderTemplate) {
+    suspend fun getOrders(isDraft: Boolean): Result<List<OrderEntity>> {
+        val orders = if (isDraft) {
+            dataBase.ordersDao().getDrafts()
+        } else {
+            dataBase.ordersDao().getPublished()
+        }
 
+        return Result.success(orders)
+    }
+
+    suspend fun saveOrder(template: OrderEntity): Result<Unit> {
+        dataBase.ordersDao().insertAll(template)
+        return Result.success(Unit)
+    }
+
+    suspend fun deleteOrder(order: OrderEntity) {
+        dataBase.ordersDao().delete(order)
     }
 
     suspend fun publishOrder(
         customerKey: String,
-        gods: List<GodOrderTemplate>
+        responsibleKey: String,
+        gods: List<GodOrderTemplate>,
     ): Result<EmptyResponse> {
-        return apiDataSource.publishOrder(customerKey, gods)
+        return apiDataSource.publishOrder(customerKey, responsibleKey, gods)
     }
 
-    suspend fun getCustomers(): Result<List<CustomerData>> {
-        customerJob?.join()
-        return syncCustomers()
+    private suspend fun fetchResponsible(): Result<List<ResponsibleData>> {
+        return apiDataSource.getResponsible()
     }
 
-    private suspend fun syncGods(): Result<List<GodsData>> {
-        if (cachedGods.isNotEmpty()) {
-            return Result.success(cachedGods)
-        }
-
+    private suspend fun fetchGods(): Result<List<GodsData>> {
         return apiDataSource.getGods()
-            .map { it.data }
-            .onSuccess {
-                System.err.println("START MAP amount")
-                cachedGods.clear()
-                cachedGods.addAll(it.map { god ->
-                    god.amount = calculateAmount(god.refKey)
-                    god.measure = calculateMeasure(god.measureKey)
-                    god
-                })
-                System.err.println("Finish MAP amount")
-            }
     }
 
-    private suspend fun syncCustomers(): Result<List<CustomerData>> {
-        if (cachedCustomers.isNotEmpty()) {
-            return Result.success(cachedCustomers)
-        }
-
+    private suspend fun fetchCustomers(): Result<List<CustomerData>> {
         return apiDataSource.getCustomers()
-            .map { it.data }
-            .onSuccess {
-                cachedCustomers.clear()
-                cachedCustomers.addAll(it)
-            }
     }
 
-    private suspend fun syncStorage(): Result<List<StorageData>> {
+    private suspend fun fetchStorage(): Result<List<StorageRecordData>> {
         return apiDataSource.getStorage()
-            .map { it.data }
-            .onSuccess {
-                cachedStorage.clear()
-                cachedStorage.addAll(it)
-            }
     }
 
-    private suspend fun syncMeasure(): Result<List<MeasureData>> {
+    private suspend fun fetchMeasure(): Result<List<MeasureData>> {
         return apiDataSource.getMeasure()
-            .map { it.data }
-            .onSuccess {
-                cachedMeasure.clear()
-                cachedMeasure.addAll(it)
-            }
     }
 
-    private suspend fun calculateAmount(refKey: String): Float {
-        storageJob?.join()
-
+    private fun calculateAmount(storageRecordData: List<StorageRecordData>): Float {
         var itemsAmount = 0.0F
-        cachedStorage.groupBy { it.recorderType }.forEach { key, items ->
-            when (key) {
+        storageRecordData.forEach {
+            val amount = it.amount ?: 0F
+            when (it.recorderType) {
                 "StandardODATA.Document_ОприходованиеЗапасов" -> {
-                    val sum = items.filter { it.refKey == refKey }.map { it.amount ?: 0.0F }.sum()
-                    itemsAmount += sum
+                    itemsAmount += amount
                 }
 
                 "StandardODATA.Document_ПриходнаяНакладная" -> {
-                    val sum = items.filter { it.refKey == refKey }.map { it.amount ?: 0.0F }.sum()
-                    itemsAmount += sum
+                    itemsAmount += amount
                 }
 
                 "StandardODATA.Document_РасходнаяНакладная" -> {
-                    val sum = items.filter { it.refKey == refKey }.map { it.amount ?: 0.0F }.sum()
-                    itemsAmount -= sum
+                    itemsAmount -= amount
                 }
 
                 "StandardODATA.Document_СписаниеЗапасов" -> {
-                    val sum = items.filter { it.refKey == refKey }.map { it.amount ?: 0.0F }.sum()
-                    itemsAmount -= sum
+                    itemsAmount -= amount
                 }
             }
         }
 
         return itemsAmount
-    }
-
-    private suspend fun calculateMeasure(refKey: String?): MeasureData? {
-        measureJob?.join()
-        return cachedMeasure.firstOrNull { it.refKey == refKey }
     }
 }
 
@@ -188,4 +182,8 @@ inline fun <R : Result<*>, V> Result<V>.chain(
         null -> onSuccess(getOrNull() as V)
         else -> Result.failure<V>(exception) as R
     }
+}
+
+enum class SyncStatus() {
+
 }

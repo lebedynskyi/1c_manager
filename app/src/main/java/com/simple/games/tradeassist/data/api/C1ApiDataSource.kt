@@ -4,11 +4,11 @@ import com.simple.games.tradeassist.data.api.request.RequestPublishGod
 import com.simple.games.tradeassist.data.api.request.RequestPublishOrder
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.MeasureData
-import com.simple.games.tradeassist.data.api.response.DataResponse
 import com.simple.games.tradeassist.data.api.response.EmptyResponse
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.OrderHistoryData
-import com.simple.games.tradeassist.data.api.response.StorageData
+import com.simple.games.tradeassist.data.api.response.ResponsibleData
+import com.simple.games.tradeassist.data.api.response.StorageRecordData
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import kotlinx.coroutines.CoroutineDispatcher
 import java.text.SimpleDateFormat
@@ -33,21 +33,9 @@ class C1ApiDataSource @Inject constructor(
         }
     }
 
-    suspend fun getGods(): Result<DataResponse<GodsData>> {
-        return apiCall { c1Api.fetchGods(authKey) }
-    }
-
-    suspend fun getOrderHistory(customerKey: String): Result<DataResponse<OrderHistoryData>> {
-        return apiCall {
-            c1Api.fetchOrderHistory(
-                auth = authKey,
-                customerFilter = "Контрагент_Key eq guid'$customerKey'"
-            )
-        }
-    }
-
     suspend fun publishOrder(
         customerKey: String,
+        responsibleKey: String,
         gods: List<GodOrderTemplate>
     ): Result<EmptyResponse> {
         val currentDate = c1DateFormatter.format(Calendar.getInstance().time)
@@ -56,17 +44,18 @@ class C1ApiDataSource @Inject constructor(
         return apiCall {
             c1Api.publishOrder(auth = authKey, RequestPublishOrder(
                 customerKey = customerKey,
+                orderResponsibleKey = responsibleKey,
                 date = currentDate,
                 dateOfDelivery = currentDate,
                 orderSum = orderSum,
                 orderGods = gods.mapIndexed { index, it ->
                     RequestPublishGod(
-                        godRefKey = it.godsData.refKey,
+                        godRefKey = it.godEntity.data.refKey,
                         deliveryDate = currentDate,
                         godsItemsAmount = it.amount,
                         godsPriceSum = it.sum,
                         godsPriceSumAll = it.sum,
-                        measureKey = it.godsData.measureKey.orEmpty(),
+                        measureKey = it.godEntity.data.measureKey.orEmpty(),
                         price = it.price,
                         sortNumber = (index + 1).toString()
                     )
@@ -75,15 +64,41 @@ class C1ApiDataSource @Inject constructor(
         }
     }
 
-    suspend fun getCustomers(): Result<DataResponse<CustomerData>> {
-        return apiCall { c1Api.fetchCustomers(authKey) }
+    suspend fun getGods(): Result<List<GodsData>> {
+        return apiCall { c1Api.fetchGods(authKey) }.map { it.data }
     }
 
-    suspend fun getStorage(): Result<DataResponse<StorageData>> {
-        return apiCall { c1Api.fetchStorage(authKey) }
+    suspend fun getResponsible(): Result<List<ResponsibleData>> {
+        return apiCall { c1Api.fetchResponsible(authKey) }.map { it.data }
     }
 
-    suspend fun getMeasure(): Result<DataResponse<MeasureData>> {
-        return apiCall { c1Api.fetchMeasure(authKey) }
+    suspend fun getOrderHistory(customerKey: String): Result<List<OrderHistoryData>> {
+        return apiCall {
+            c1Api.fetchOrderHistory(
+                auth = authKey,
+                customerFilter = "Контрагент_Key eq guid'$customerKey'"
+            )
+        }.map { it.data }
+    }
+
+
+    suspend fun getCustomers(): Result<List<CustomerData>> {
+        return apiCall { c1Api.fetchCustomers(authKey) }.map { it.data }
+    }
+
+    suspend fun getStorage(): Result<List<StorageRecordData>> {
+        return apiCall { c1Api.fetchStorage(authKey) }.map {
+            it.data.map { data ->
+                data.storageSet.forEach {
+                    it.recorderType = data.recorderType
+                }
+
+                data.storageSet
+            }.flatten()
+        }
+    }
+
+    suspend fun getMeasure(): Result<List<MeasureData>> {
+        return apiCall { c1Api.fetchMeasure(authKey) }.map { it.data }
     }
 }

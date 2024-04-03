@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.navigation.NavHostController
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
+import com.simple.games.tradeassist.domain.GodEntity
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -43,7 +44,7 @@ class Navigator @Inject constructor() {
         controller?.navigate(AppRoute.GodsSelectionRoute.route)
     }
 
-    fun toGodsInfo(customer: CustomerData?, god: GodsData, amount: Float? = null, price: Float? = null) {
+    fun toGodsInfo(customer: CustomerData?, god: GodEntity, amount: Float? = null, price: Float? = null) {
         controller?.putArgument(AppRoute.GodsInfoRoute.argGods, god)
         controller?.putArgument(AppRoute.GodsInfoRoute.argCustomer, customer)
         controller?.putArgument(AppRoute.GodsInfoRoute.argAmount, amount)

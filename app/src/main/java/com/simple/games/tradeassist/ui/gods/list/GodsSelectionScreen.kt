@@ -162,7 +162,7 @@ fun GodsSelectionScreenContent(
             ) {
                 for (t in godsList) {
                     TreeBranch(t, orders = ordersList) {
-                        if (it.content.isFolder) {
+                        if (it.content.data.isFolder) {
                             it.expanded = !it.expanded
                             refreshTrigger = refreshTrigger.inc()
                         } else {
@@ -181,7 +181,7 @@ fun LazyListScope.TreeBranch(
     shift: Int = 0,
     onItemClick: (TreeNode) -> Unit,
 ) {
-    val existedOrder = orders?.firstOrNull { it.godsData.refKey == node.content.refKey }
+    val existedOrder = orders?.firstOrNull { it.godEntity.data.refKey == node.content.data.refKey }
     TreeLeaf(node, existedOrder, shift, onItemClick)
 
     if (node.expanded) {
@@ -216,7 +216,7 @@ fun LazyListScope.TreeLeaf(
                     if (shift > 0) {
                         Spacer(modifier = Modifier.size((shiftSize).dp))
                     }
-                    if (node.content.isFolder) {
+                    if (node.content.data.isFolder) {
                         if (node.expanded) {
                             Image(
                                 modifier = Modifier.size(20.dp),
@@ -241,7 +241,7 @@ fun LazyListScope.TreeLeaf(
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f),
-                            text = node.content.description.orEmpty()
+                            text = node.content.data.description.orEmpty()
                         )
                     } else {
                         Spacer(
@@ -258,9 +258,9 @@ fun LazyListScope.TreeLeaf(
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f),
-                            text = node.content.description.orEmpty()
+                            text = node.content.data.description.orEmpty()
                         )
-                        Text(text = "${node.content.amount} ${node.content.measure?.name ?: ""}")
+                        Text(text = "${node.content.availableAmount} ${node.content.measureData?.name ?: ""}")
                         Spacer(modifier = Modifier.size(8.dp))
                     }
                 }
@@ -269,75 +269,12 @@ fun LazyListScope.TreeLeaf(
                     Text(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(start = (24 + shiftSize).dp),
-                        text = "В заказe ${order.amount} ${order.godsData.measure?.name ?: ""} по цене ${order.price} грн"
+                        text = "В заказe ${order.amount} ${order.godEntity.measureData?.name ?: ""} по цене ${order.price} грн"
                     )
                 }
             }
 
             HorizontalDivider(thickness = 0.5.dp)
         }
-    }
-}
-
-
-@Preview
-@Composable
-fun GodsSelectionScreenPreview() {
-    TradeAssistTheme {
-        GodsSelectionScreen(
-            GodsSelectionViewState(
-                orderTemplates = listOf(
-                    GodOrderTemplate(CustomerData().apply { refKey = "155" }, GodsData().apply {
-                        refKey = "155"
-                    }, 2F, 2F)
-                ),
-                godsList = listOf(
-                    TreeNode(GodsData().apply {
-                        refKey = ""
-                        isFolder = true
-                        description = "Длиное название катгеории. Хочу чтоб было 2 линии"
-                    }),
-                    TreeNode(
-                        GodsData().apply {
-                            refKey = ""
-                            isFolder = true
-                            description = "folder2"
-                        }, expanded = true, children = mutableListOf(
-                            TreeNode(GodsData().apply {
-                                refKey = ""
-                                isFolder = true
-                                description = "folder3"
-                            }),
-                            TreeNode(GodsData().apply {
-                                refKey = "155"
-                                description = "File1"
-                            }),
-                        )
-                    ),
-                    TreeNode(GodsData().apply {
-                        refKey = ""
-                        isFolder = true
-                        description = "folder3"
-                    }),
-                    TreeNode(GodsData().apply {
-                        refKey = ""
-                        refKey = "155"
-                        description =
-                            "Длиное название катгеории. Хочу чтоб было 2 линии в притык к колличеству"
-                        measure = MeasureData().apply { name = "шт" }
-                    }),
-                    TreeNode(GodsData().apply {
-                        refKey = ""
-                        description =
-                            "Длиное название катгеории. Хочу чтоб было 2 линии в притык к колличеству"
-                    }),
-                    TreeNode(GodsData().apply {
-                        refKey = ""
-                        description = "File3"
-                    }),
-
-                    )
-            )
-        )
     }
 }

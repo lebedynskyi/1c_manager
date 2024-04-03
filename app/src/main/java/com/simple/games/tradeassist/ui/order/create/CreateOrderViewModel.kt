@@ -3,6 +3,7 @@ package com.simple.games.tradeassist.ui.order.create
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.domain.C1Repository
+import com.simple.games.tradeassist.domain.OrderEntity
 import com.simple.games.tradeassist.ui.base.AppViewModel
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +33,7 @@ class CreateOrderViewModel @Inject constructor(
             is CreateOrderUIEvent.OnGodAdded -> handleGodAdded(event.god)
             is CreateOrderUIEvent.OnGodRemoveClicked -> handleGodRemoved(event.god)
             is CreateOrderUIEvent.OnGodEditClick -> handleGodEdit(event.god)
-            is CreateOrderUIEvent.Publish -> handlePublish()
+            is CreateOrderUIEvent.SaveOrder -> handleSaveOrder()
         }
 
         super.onUIEvent(event)
@@ -42,7 +43,7 @@ class CreateOrderViewModel @Inject constructor(
         reduce {
             orderTemplates = mutableListOf<GodOrderTemplate>().apply {
                 orderGods.forEach {
-                    if (it.godsData.refKey == god.godsData.refKey) {
+                    if (it.godEntity.data.refKey == god.godEntity.data.refKey) {
                         add(god)
                     } else {
                         add(it)
@@ -52,14 +53,18 @@ class CreateOrderViewModel @Inject constructor(
         }
     }
 
-    private fun handlePublish() = launch { state ->
+    private fun handleSaveOrder() = launch { state ->
         val customer = state.selectedCustomer ?: return@launch
         val gods = state.orderTemplates ?: return@launch
-        repository.publishOrder(customerKey = customer.refKey, gods).onSuccess {
-            System.err.println("SUCCES!!!")
-        }.onFailure {
-            System.err.println("FAIL!!!!!!")
-            it.printStackTrace()
+
+        repository.saveOrder(OrderEntity().apply {
+            customerKey = customer.refKey
+            customerName = customer.description.orEmpty()
+            responsibleKey = "UNKKNOWN"
+            responsibleName = "UNKKNOWN"
+            this.gods = gods
+        }).onSuccess {
+            navigate { toBack() }
         }
     }
 
@@ -89,7 +94,7 @@ class CreateOrderViewModel @Inject constructor(
     private fun handleGodEdit(order: GodOrderTemplate) = launch { state ->
         val customer = state.selectedCustomer ?: return@launch
         navigate {
-            toGodsInfo(customer, order.godsData, order.amount, order.price)
+            toGodsInfo(customer, order.godEntity, order.amount, order.price)
         }
     }
 
