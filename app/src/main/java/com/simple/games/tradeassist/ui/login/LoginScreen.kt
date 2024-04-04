@@ -67,8 +67,8 @@ private fun LoginForm(
     modifier: Modifier = Modifier,
     onLoginClick: (String, String) -> Unit
 ) {
-    var login by remember { mutableStateOf("стас") }
-    var passsword by remember { mutableStateOf("1989") }
+    var login by remember { mutableStateOf("") }
+    var passsword by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier

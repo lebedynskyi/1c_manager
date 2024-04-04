@@ -1,16 +1,18 @@
 PRICE???
 
-RESPONSIBLE
-EDIT Order
-PUBLISH ORDER Card UI
+статус заказа и отгруженно со склада.
 
+Responsible for order
+Edit order
+
+gods list - Move add button to bottom
 gods list - search with folder path
 gods list = argument of already added gods
+
+Full offline mode
 
 God info - discard dialog
 Create order discard dialog
 
 Error handling
-
-Вопрос СТАСУ!
-Как различать визуально какой из кабелей в заказе если одно и тоже имя в разных папках ? или это уже не важно?
+repeat network call

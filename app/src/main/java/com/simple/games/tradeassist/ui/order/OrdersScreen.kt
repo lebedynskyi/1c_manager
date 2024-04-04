@@ -71,7 +71,7 @@ fun OrdersScreen(
                             }
                         }
                     })
-                
+
                 HorizontalDivider(thickness = 0.5.dp)
                 TabRow(selectedTabIndex = state.selectedTab) {
                     Tab(modifier = Modifier.height(48.dp),
@@ -176,16 +176,18 @@ private fun OrderItem(
                 Text(text = order.responsibleName, style = MaterialTheme.typography.titleMedium)
             }
             HorizontalDivider(thickness = 0.5.dp)
-            Column {
-                order.gods.forEach {
-                    Text(
-                        text = "${it.godEntity.data.description}",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(text = "Кол.: ${it.amount} ${it.godEntity.measureData?.name}")
-                    Text(text = "Цена: ${it.price} грн")
-                    Text(text = "Сумма: ${it.sum} грн")
-                    HorizontalDivider(thickness = 0.5.dp)
+            if (order.refKey.isNullOrBlank()) {
+                Column {
+                    order.gods.forEach {
+                        Text(
+                            text = "${it.godEntity.data.description}",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(text = "Кол.: ${it.amount} ${it.godEntity.measureData?.name}")
+                        Text(text = "Цена: ${it.price} грн")
+                        Text(text = "Сумма: ${it.sum} грн")
+                        HorizontalDivider(thickness = 0.5.dp)
+                    }
                 }
             }
 
@@ -198,14 +200,13 @@ private fun OrderItem(
             }
             HorizontalDivider(thickness = 0.5.dp)
 
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                onClick = { onDeleteClick(order) }) {
-                Text(text = "Удалить")
-            }
-
-            if (order.refKey.isNullOrBlank()){
+            if (order.refKey.isNullOrBlank()) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    onClick = { onDeleteClick(order) }) {
+                    Text(text = "Удалить")
+                }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
@@ -230,6 +231,7 @@ fun PreviewOrdersScreen() {
     TradeAssistTheme {
         OrdersScreen(state = OrdersViewState(0, orders = listOf(
             OrderEntity().apply {
+                refKey = "das"
                 customerName = "ФОП Скай лаб моторс покупатель"
                 responsibleName = "Алина"
                 gods = listOf(

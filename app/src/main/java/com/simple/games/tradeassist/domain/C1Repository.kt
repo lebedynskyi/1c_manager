@@ -1,5 +1,6 @@
 package com.simple.games.tradeassist.domain
 
+import androidx.room.withTransaction
 import com.simple.games.tradeassist.data.api.C1ApiDataSource
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.EmptyResponse
@@ -10,7 +11,6 @@ import com.simple.games.tradeassist.data.api.response.OrderHistoryData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.data.api.response.StorageRecordData
 import com.simple.games.tradeassist.data.db.DataBase
-import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -46,6 +46,15 @@ class C1Repository @Inject constructor(
             dataBase.godsDao().insertAll(it)
         }.map {
             true
+        }
+    }
+
+    suspend fun syncStorage(){
+        fetchStorage().onSuccess {
+            dataBase.withTransaction {
+                dataBase.storageDao().purge()
+                dataBase.storageDao().insertAll(it)
+            }
         }
     }
 

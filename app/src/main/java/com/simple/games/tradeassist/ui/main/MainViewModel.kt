@@ -26,16 +26,12 @@ class MainViewModel @Inject constructor(
     private fun handleScreenLoaded() = launch {
         if (!repository.hasData()){
             reduce { requestInProgress = true }
-            repository.syncData().onSuccess {
-                System.err.println("Data sync success!!")
-            }.onFailure {
-                System.err.println("Data sync failure")
-                it.printStackTrace()
+            repository.syncData()
+            reduce {
+                requestInProgress = false
             }
-        }
-
-        reduce {
-            requestInProgress = false
+        } else {
+            repository.syncStorage()
         }
     }
 

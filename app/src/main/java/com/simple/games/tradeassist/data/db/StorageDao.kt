@@ -18,6 +18,9 @@ interface StorageDao {
     @Delete
     suspend fun delete(customers: StorageRecordData)
 
+    @Query("DELETE FROM storage")
+    fun purge()
+
     @Query("SELECT COUNT(godRefKey) FROM storage")
     suspend fun getCount(): Int
 }
