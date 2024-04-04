@@ -82,6 +82,10 @@ class C1Repository @Inject constructor(
         return Result.success(dataBase.customersDao().getAll())
     }
 
+    suspend fun getResponsible(): Result<List<ResponsibleData>> {
+        return Result.success(dataBase.responsibleDao().getAll())
+    }
+
     suspend fun getOrderHistory(customerKey: String): Result<List<OrderHistoryData>> {
         return apiDataSource.getOrderHistory(customerKey)
     }
@@ -121,11 +125,12 @@ class C1Repository @Inject constructor(
     }
 
     suspend fun publishOrder(
-        customerKey: String,
-        responsibleKey: String,
-        gods: List<GodOrderTemplate>,
+        order: OrderEntity
     ): Result<EmptyResponse> {
-        return apiDataSource.publishOrder(customerKey, responsibleKey, gods)
+        return apiDataSource.publishOrder(order.customerKey, order.responsibleKey, order.gods).onSuccess {
+            order.refKey = "Created"
+            dataBase.ordersDao().insertAll(order)
+        }
     }
 
     private suspend fun fetchResponsible(): Result<List<ResponsibleData>> {

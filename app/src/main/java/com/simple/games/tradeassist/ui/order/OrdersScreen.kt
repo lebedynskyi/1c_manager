@@ -205,18 +205,20 @@ private fun OrderItem(
                 Text(text = "Удалить")
             }
 
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                onClick = { onEditClick(order) }) {
-                Text(
-                    text = "Редактировать",
-                    color = MaterialTheme.colorScheme.onErrorContainer
-                )
-            }
+            if (order.refKey.isNullOrBlank()){
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                    onClick = { onEditClick(order) }) {
+                    Text(
+                        text = "Редактировать",
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
 
-            Button(modifier = Modifier.fillMaxWidth(), onClick = { onPublishClick(order) }) {
-                Text(text = "Опубликовать")
+                Button(modifier = Modifier.fillMaxWidth(), onClick = { onPublishClick(order) }) {
+                    Text(text = "Опубликовать")
+                }
             }
         }
     }

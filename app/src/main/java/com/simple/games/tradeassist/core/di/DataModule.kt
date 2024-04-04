@@ -69,7 +69,7 @@ class DataModule {
         httpClientBuilder.readTimeout(0, TimeUnit.SECONDS)
         httpClientBuilder.writeTimeout(0, TimeUnit.SECONDS)
         val loggerInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.HEADERS
+            level = HttpLoggingInterceptor.Level.BODY
         }
         httpClientBuilder.addInterceptor(loggerInterceptor)
         return httpClientBuilder.build()

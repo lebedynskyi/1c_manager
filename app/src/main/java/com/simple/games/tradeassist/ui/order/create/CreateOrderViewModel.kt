@@ -2,6 +2,7 @@ package com.simple.games.tradeassist.ui.order.create
 
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.data.api.response.CustomerData
+import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.domain.OrderEntity
 import com.simple.games.tradeassist.ui.base.AppViewModel
@@ -18,7 +19,12 @@ class CreateOrderViewModel @Inject constructor(
     override val viewStateCopy: CreateOrderViewState get() = viewState.value.copy()
 
     private val loadedCustomers: MutableList<CustomerData> = mutableListOf()
+    private val loadedResponsible: MutableList<ResponsibleData> = mutableListOf()
     private val orderGods: MutableList<GodOrderTemplate> = mutableListOf()
+
+    private var selectedCustomer: CustomerData? = null
+    private var selectedResponsible: ResponsibleData? = null
+
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
@@ -29,6 +35,7 @@ class CreateOrderViewModel @Inject constructor(
             is CreateOrderUIEvent.OnCustomerNameChange -> handleCustomerNameChange(event.name)
             is CreateOrderUIEvent.OnDismissCustomerDropDown -> handleDismissCustomerDropDown()
             is CreateOrderUIEvent.OnCustomerSelected -> handleCustomerSelected(event.customer)
+            is CreateOrderUIEvent.OnResponsibleSelected -> handleResponsibleSelected(event.responsible)
             is CreateOrderUIEvent.OnGodsAdded -> handleGodsAdded(event.gods)
             is CreateOrderUIEvent.OnGodAdded -> handleGodAdded(event.god)
             is CreateOrderUIEvent.OnGodRemoveClicked -> handleGodRemoved(event.god)
@@ -54,14 +61,14 @@ class CreateOrderViewModel @Inject constructor(
     }
 
     private fun handleSaveOrder() = launch { state ->
-        val customer = state.selectedCustomer ?: return@launch
+        val customer = selectedCustomer ?: return@launch
         val gods = state.orderTemplates ?: return@launch
 
         repository.saveOrder(OrderEntity().apply {
             customerKey = customer.refKey
             customerName = customer.description.orEmpty()
-            responsibleKey = "UNKKNOWN"
-            responsibleName = "UNKKNOWN"
+            responsibleKey = selectedResponsible?.refKey.orEmpty()
+            responsibleName = selectedResponsible?.name.orEmpty()
             this.gods = gods
         }).onSuccess {
             navigate { toBack() }
@@ -92,15 +99,23 @@ class CreateOrderViewModel @Inject constructor(
     }
 
     private fun handleGodEdit(order: GodOrderTemplate) = launch { state ->
-        val customer = state.selectedCustomer ?: return@launch
+        val customer = selectedCustomer ?: return@launch
         navigate {
             toGodsInfo(customer, order.godEntity, order.amount, order.price)
         }
     }
+    private fun handleResponsibleSelected(responsible: ResponsibleData) {
+        selectedResponsible = responsible
+
+        reduce {
+            responsibleName = responsible.name
+        }
+    }
 
     private fun handleCustomerSelected(customer: CustomerData) {
+        selectedCustomer = customer
+
         reduce {
-            selectedCustomer = customer
             addGodsEnabled = true
             customerName = customer.description.orEmpty()
             filteredCustomers = emptyList()
@@ -128,15 +143,26 @@ class CreateOrderViewModel @Inject constructor(
     }
 
     private fun handleScreenLoaded() = launch {
-        if (loadedCustomers.isNotEmpty()) {
-            return@launch
-        }
-
         reduce { requestInProgress = true }
 
-        repository.getCustomers().onSuccess {
-            loadedCustomers.clear()
-            loadedCustomers.addAll(it.sortedBy { it.description?.lowercase() ?: "" })
+        if (loadedCustomers.isEmpty()) {
+            repository.getCustomers().onSuccess {
+                loadedCustomers.clear()
+                loadedCustomers.addAll(it.sortedBy { it.description?.lowercase() ?: "" })
+            }
+
+        }
+        if (loadedResponsible.isEmpty()) {
+            repository.getResponsible().onSuccess {
+                loadedResponsible.clear()
+                loadedResponsible.addAll(it)
+
+                selectedResponsible = it.firstOrNull()
+
+                reduce {
+                    responsible = it
+                }
+            }
         }
 
         reduce { requestInProgress = false }
@@ -147,7 +173,7 @@ class CreateOrderViewModel @Inject constructor(
     }
 
     private fun handleAddGods() = launch { state ->
-        val customer = state.selectedCustomer ?: return@launch
+        val customer = selectedCustomer ?: return@launch
         navigate { toGodsSelection(customer) }
     }
 }

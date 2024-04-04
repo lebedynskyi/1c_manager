@@ -1,5 +1,9 @@
 PRICE???
 
+RESPONSIBLE
+EDIT Order
+PUBLISH ORDER Card UI
+
 gods list - search with folder path
 gods list = argument of already added gods
 

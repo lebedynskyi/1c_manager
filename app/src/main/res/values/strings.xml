@@ -7,15 +7,16 @@
     <string name="orders">Заказы</string>
     <string name="main">Главная</string>
     <string name="drafts">Черновики</string>
-    <string name="history">Обработанные</string>
+    <string name="history">Опубликованные</string>
     <string name="no_orders">Нет Заказов</string>
     <string name="create_order">Создать заказа</string>
     <string name="creation_order">Создание заказа</string>
     <string name="edit_order">Редактирование заказ</string>
     <string name="customer">Заказчик</string>
+    <string name="customers">Заказчики</string>
     <string name="gods">Товары:</string>
     <string name="gods_title">Товары</string>
-    <string name="no_gods">Нет добавленных товаров.</string>
+    <string name="no_gods">Нет добавленных товаров. Выберите заказчика и нажмите добавить</string>
     <string name="add_god">Добавить товар</string>
     <string name="delivery_address">Адресс доставки</string>
     <string name="delivery_time">Дата доставки</string>
@@ -23,4 +24,5 @@
     <string name="god_info">Детали товара</string>
     <string name="delete_order_template">Удалить товар</string>
     <string name="edit_order_template">Редактировать</string>
+    <string name="save_order">Сохранить заказ</string>
 </resources>

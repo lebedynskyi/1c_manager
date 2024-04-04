@@ -31,7 +31,7 @@ class OrdersViewModel @Inject constructor(
     private fun handlePublishClick(order: OrderEntity) = launch { state ->
         reduce { requestInProgress = true }
 
-        repository.publishOrder(order.customerKey, order.responsibleKey, order.gods)
+        repository.publishOrder(order)
 
         repository.getOrders(state.isDrafts).onSuccess {
             reduce {

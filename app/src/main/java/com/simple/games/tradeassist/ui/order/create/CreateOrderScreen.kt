@@ -28,7 +28,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,10 +46,12 @@ import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.MeasureData
+import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.domain.GodEntity
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
+import kotlin.math.exp
 
 @Composable
 fun CreateOrderScreen(
@@ -66,9 +71,11 @@ fun CreateOrderScreen(
         HorizontalDivider(modifier = Modifier.padding(it), thickness = 0.5.dp)
         CreateOrderScreenContent(
             state.customerName,
+            responsbleName = state.responsibleName,
             customers = state.filteredCustomers,
             addGodsEnabled = state.addGodsEnabled,
             gods = state.orderTemplates,
+            responsibleList = state.responsible,
             modifier = Modifier.padding(it),
             onAddGods = { onUIEvent(CreateOrderUIEvent.OnAddGods) },
             onSaveOrder = { onUIEvent(CreateOrderUIEvent.SaveOrder) },
@@ -84,7 +91,16 @@ fun CreateOrderScreen(
             onDismissDropDown = remember { { onUIEvent(CreateOrderUIEvent.OnDismissCustomerDropDown) } },
             onCustomerSelected = remember { { onUIEvent(CreateOrderUIEvent.OnCustomerSelected(it)) } },
             onRemoveGod = remember { { onUIEvent(CreateOrderUIEvent.OnGodRemoveClicked(it)) } },
-            onEditGod = remember { { onUIEvent(CreateOrderUIEvent.OnGodEditClick(it)) } }
+            onEditGod = remember { { onUIEvent(CreateOrderUIEvent.OnGodEditClick(it)) } },
+            onResponsibleSelected = remember {
+                {
+                    onUIEvent(
+                        CreateOrderUIEvent.OnResponsibleSelected(
+                            it
+                        )
+                    )
+                }
+            }
         )
     }
 
@@ -96,9 +112,11 @@ fun CreateOrderScreen(
 @Composable
 fun CreateOrderScreenContent(
     customerInput: String,
+    responsbleName: String?,
     gods: List<GodOrderTemplate>?,
     addGodsEnabled: Boolean,
     customers: List<CustomerData>,
+    responsibleList: List<ResponsibleData>?,
     modifier: Modifier = Modifier,
     onAddGods: () -> Unit,
     onSaveOrder: () -> Unit,
@@ -107,6 +125,7 @@ fun CreateOrderScreenContent(
     onCustomerSelected: (CustomerData) -> Unit,
     onRemoveGod: (GodOrderTemplate) -> Unit,
     onEditGod: (GodOrderTemplate) -> Unit,
+    onResponsibleSelected: (ResponsibleData) -> Unit
 ) {
 
     Column(
@@ -118,75 +137,40 @@ fun CreateOrderScreenContent(
                 orientation = Orientation.Vertical
             )
     ) {
-        ExposedDropdownMenuBox(
-            modifier = Modifier.fillMaxWidth(),
-            expanded = customers.isNotEmpty(),
-            onExpandedChange = {
-                if (!it) onDismissDropDown()
-            }) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(),
+        CustomersDropDownMenu(
+            customers,
+            customerInput,
+            onCustomerNameChanged,
+            onDismissDropDown,
+            onCustomerSelected
+        )
 
-                value = TextFieldValue(customerInput, selection = TextRange(customerInput.length)),
-                onValueChange = {
-                    onCustomerNameChanged(it.text)
-                }, placeholder = {
-                    Text(text = stringResource(id = R.string.customer))
-                }, label = {
-                    Text(text = stringResource(id = R.string.customer))
-                })
-
-            ExposedDropdownMenu(
-                focusable = false,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .exposedDropdownSize(),
-                expanded = customers.isNotEmpty(),
-                onDismissRequest = {
-                    System.err.println("DISMISS REQUST")
-                },
-            ) {
-                customers.forEachIndexed { index, customer ->
-                    DropdownMenuItem(text = {
-                        Column(
-                            modifier = Modifier.height(48.dp),
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .weight(1f),
-                                text = customer.description.orEmpty()
-                            )
-
-                            if (index != customers.size - 1) {
-                                HorizontalDivider(thickness = 0.5.dp)
-                            }
-                        }
-                    }, onClick = {
-                        onCustomerSelected(customer)
-                    })
-                }
-            }
-        }
+        Spacer(modifier = Modifier.size(24.dp))
+        ResponsibleDropDownMenu(
+            responsbleName,
+            responsibleList,
+            onResponsibleSelected
+        )
 
         Spacer(Modifier.size(12.dp))
         HorizontalDivider(modifier = Modifier.padding(), thickness = 0.5.dp)
         Spacer(Modifier.size(12.dp))
 
         if (gods.isNullOrEmpty()) {
-            Text(
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.no_gods)
-            )
-            Spacer(Modifier.size(24.dp))
-            Button(modifier = Modifier.fillMaxWidth(),
-                enabled = addGodsEnabled,
-                onClick = { onAddGods() }) {
-                Text(text = stringResource(id = R.string.add_god))
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    textAlign = TextAlign.Center,
+                    text = stringResource(id = R.string.no_gods)
+                )
+                Spacer(Modifier.size(12.dp))
+                Button(enabled = addGodsEnabled,
+                    onClick = { onAddGods() }) {
+                    Text(text = stringResource(id = R.string.add_god))
+                }
             }
         } else {
             LazyColumn(
@@ -214,7 +198,7 @@ fun CreateOrderScreenContent(
                                 Text(text = "Колличесство:", modifier = Modifier.weight(1F))
 
                                 Text(
-                                    modifier = Modifier.padding(12.dp),
+                                    modifier = Modifier.padding(4.dp),
                                     textAlign = TextAlign.Center,
                                     text = "${god.amount} ${god.godEntity.measureData?.name}",
                                 )
@@ -227,7 +211,7 @@ fun CreateOrderScreenContent(
                             ) {
                                 Text(text = "Цена покупки: ", modifier = Modifier.weight(3F))
                                 Text(
-                                    modifier = Modifier.padding(12.dp),
+                                    modifier = Modifier.padding(4.dp),
                                     textAlign = TextAlign.Center,
                                     text = "${god.price} грн",
                                 )
@@ -240,7 +224,7 @@ fun CreateOrderScreenContent(
                             ) {
                                 Text(text = "Вся сумма: ", modifier = Modifier.weight(3F))
                                 Text(
-                                    modifier = Modifier.padding(12.dp),
+                                    modifier = Modifier.padding(4.dp),
                                     textAlign = TextAlign.Center,
                                     text = "${god.sum} грн",
                                 )
@@ -290,10 +274,141 @@ fun CreateOrderScreenContent(
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         enabled = addGodsEnabled,
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
                         onClick = { onSaveOrder() }) {
-                        Text(text = "Сохранить заказ")
+                        if (addGodsEnabled) {
+                            Text(
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                text = stringResource(R.string.save_order)
+                            )
+                        } else {
+                            Text(text = stringResource(R.string.save_order))
+                        }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ResponsibleDropDownMenu(
+    responsibleName: String?,
+    responsibleList: List<ResponsibleData>?,
+    onResponsibleSelected: (ResponsibleData) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        modifier = Modifier.fillMaxWidth(),
+        expanded = expanded,
+        onExpandedChange = { expanded = it })
+    {
+        Button(modifier = Modifier
+            .fillMaxWidth()
+            .menuAnchor(),
+            enabled = !responsibleList.isNullOrEmpty(),
+            onClick = { expanded = true }) {
+            Text(text = if (responsibleName.isNullOrBlank()) "Назначить ответственного" else "Ответственный: $responsibleName")
+        }
+
+        ExposedDropdownMenu(
+            focusable = false,
+            modifier = Modifier
+                .fillMaxWidth()
+                .exposedDropdownSize(),
+            expanded = expanded,
+            onDismissRequest = {
+                expanded = false
+            },
+        ) {
+            responsibleList?.forEachIndexed { index, responsible ->
+                DropdownMenuItem(text = {
+                    Column(
+                        modifier = Modifier.height(48.dp)
+                    ) {
+                        Column(
+                            Modifier
+                                .weight(1F)
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = responsible.name.orEmpty())
+                        }
+
+                        if (index != responsibleList.size - 1) {
+                            HorizontalDivider(thickness = 0.5.dp)
+                        }
+                    }
+                }, onClick = {
+                    expanded = false
+                    onResponsibleSelected(responsible)
+                })
+            }
+        }
+    }
+}
+
+@Composable
+private fun CustomersDropDownMenu(
+    suggestingCustomers: List<CustomerData>,
+    customerInput: String,
+    onCustomerNameChanged: (String) -> Unit,
+    onDismissDropDown: () -> Unit,
+    onCustomerSelected: (CustomerData) -> Unit,
+) {
+    ExposedDropdownMenuBox(
+        modifier = Modifier.fillMaxWidth(),
+        expanded = suggestingCustomers.isNotEmpty(),
+        onExpandedChange = {
+            if (!it) onDismissDropDown()
+        }) {
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(),
+            value = TextFieldValue(customerInput, selection = TextRange(customerInput.length)),
+            onValueChange = {
+                onCustomerNameChanged(it.text)
+            }, placeholder = {
+                Text(text = stringResource(id = R.string.customer))
+            }, label = {
+                Text(text = stringResource(id = R.string.customer))
+            })
+
+        ExposedDropdownMenu(
+            focusable = false,
+            modifier = Modifier
+                .fillMaxWidth()
+                .exposedDropdownSize(),
+            expanded = suggestingCustomers.isNotEmpty(),
+            onDismissRequest = {
+                System.err.println("DISMISS REQUST")
+            },
+        ) {
+            suggestingCustomers.forEachIndexed { index, customer ->
+                DropdownMenuItem(text = {
+                    Column {
+                        Column(
+                            modifier = Modifier.height(48.dp)
+                        ) {
+                            Column(
+                                Modifier
+                                    .weight(1F)
+                                    .fillMaxWidth(),
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(text = customer.description.orEmpty())
+                            }
+
+                            if (index != suggestingCustomers.size - 1) {
+                                HorizontalDivider(thickness = 0.5.dp)
+                            }
+                        }
+                    }
+                }, onClick = {
+                    onCustomerSelected(customer)
+                })
             }
         }
     }
@@ -306,6 +421,7 @@ fun PreviewCreateOrder() {
     TradeAssistTheme {
         CreateOrderScreen(
             state = CreateOrderViewState(
+                filteredCustomers = listOf(CustomerData().apply { description = "Helo world" }),
                 orderTemplates = buildList {
                     add(
                         GodOrderTemplate(
