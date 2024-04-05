@@ -20,7 +20,7 @@ import retrofit2.http.Query
 
 interface C1Api {
     @GET("?\$format=json")
-    suspend fun login(@Header("Authorization") auth: String): Response<EmptyResponse>
+    suspend fun login(@Header("Authorization") auth: String?): Response<EmptyResponse>
 
     @GET("Catalog_Номенклатура?\$format=json")
     suspend fun fetchGods(@Header("Authorization") auth: String?): Response<DataResponse<GodsData>>

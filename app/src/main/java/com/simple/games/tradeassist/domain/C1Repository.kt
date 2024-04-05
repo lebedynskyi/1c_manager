@@ -1,6 +1,7 @@
 package com.simple.games.tradeassist.domain
 
 import androidx.room.withTransaction
+import com.simple.games.tradeassist.data.PrefDataSource
 import com.simple.games.tradeassist.data.api.C1ApiDataSource
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.EmptyResponse
@@ -20,10 +21,23 @@ import javax.inject.Singleton
 class C1Repository @Inject constructor(
     private val apiDataSource: C1ApiDataSource,
     private val dataBase: DataBase,
+    private val preference: PrefDataSource,
     dispatcher: CoroutineDispatcher
 ) : CoroutineAware(dispatcher) {
-    suspend fun login(user: String, pass: String): Result<EmptyResponse> {
-        return apiDataSource.login(user, pass)
+
+fun initialize() : Boolean {
+        val login = preference.getUserName() ?: return false
+        val password = preference.getPassword() ?: return false
+        apiDataSource.init(login, password)
+
+        return true
+    }
+
+    suspend fun login(user: String, pass: String): Result<Boolean> {
+        return apiDataSource.login(user, pass).map { true }.onSuccess {
+            preference.saveUserName(user)
+            preference.savePassword(pass)
+        }
     }
 
     suspend fun hasData(): Boolean {
@@ -73,7 +87,14 @@ class C1Repository @Inject constructor(
                 val godMeasure = measures.firstOrNull { it.refKey == g.measureKey }
                 val godStorage = storage[g.refKey] ?: emptyList()
                 val godPrices = prices[g.refKey] ?: emptyList()
-                add(GodEntity(g, godMeasure, calculatePrice(godPrices), calculateAmount(godStorage)))
+                add(
+                    GodEntity(
+                        g,
+                        godMeasure,
+                        calculatePrice(godPrices),
+                        calculateAmount(godStorage)
+                    )
+                )
             }
         }
 
@@ -89,7 +110,8 @@ class C1Repository @Inject constructor(
         val godMeasure = measures.firstOrNull { it.refKey == god.measureKey }
         val godStorage = storage[god.refKey] ?: emptyList()
         val godPrices = prices[god.refKey] ?: emptyList()
-        val result = GodEntity(god, godMeasure, calculatePrice(godPrices), calculateAmount(godStorage))
+        val result =
+            GodEntity(god, godMeasure, calculatePrice(godPrices), calculateAmount(godStorage))
 
         return Result.success(result)
     }

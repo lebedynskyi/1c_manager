@@ -27,12 +27,18 @@ class C1ApiDataSource @Inject constructor(
     private var authKey: String? = null
     private val c1DateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
 
-    suspend fun login(user: String, pass: String): Result<EmptyResponse> {
+
+    fun init(user: String, pass: String) {
         val key = "Basic " + Base64.getEncoder().encodeToString("$user:$pass".toByteArray())
-        return apiCall { c1Api.login(key) }.onSuccess {
-            authKey = key
+        authKey = key
+    }
+
+    suspend fun login(user: String, pass: String): Result<EmptyResponse> {
+        init(user, pass)
+        return apiCall { c1Api.login(authKey) }.onSuccess {
         }
     }
+
 
     suspend fun publishOrder(
         customerKey: String,

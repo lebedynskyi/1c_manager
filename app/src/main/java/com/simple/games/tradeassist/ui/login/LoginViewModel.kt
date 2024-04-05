@@ -1,5 +1,6 @@
 package com.simple.games.tradeassist.ui.login
 
+import androidx.compose.runtime.referentialEqualityPolicy
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.ui.base.AppViewModel
@@ -22,7 +23,11 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun handleScreenLoaded() = launch {
-        handleLoginSubmitted("стас", "1989")
+        if (c1Repository.hasData() && c1Repository.initialize()) {
+            navigate {
+                toMain()
+            }
+        }
     }
 
     private fun handleLoginSubmitted(login: String, pass: String) = launch {
