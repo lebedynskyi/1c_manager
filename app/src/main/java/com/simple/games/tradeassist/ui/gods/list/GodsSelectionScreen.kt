@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,6 +49,7 @@ import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.R
 import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.data.api.response.CustomerData
+import com.simple.games.tradeassist.data.api.response.GodOrderData
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.PriceData
@@ -200,21 +203,20 @@ fun LazyListScope.TreeLeaf(
     shift: Int,
     onItemClick: (TreeNode) -> Unit,
 ) {
-    val shiftSize = 12 * shift
+    val shiftSize = 10 * shift
     item {
         Column(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .height((56 + if (order != null) 24 else 0).dp)
                 .clickable { onItemClick(node) },
         ) {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.heightIn(64.dp)
+            ) {
                 Row(
-                    modifier = Modifier
-                        .padding(end = 12.dp)
-                        .weight(1f),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (shift > 0) {
                         Spacer(modifier = Modifier.size((shiftSize).dp))
@@ -259,23 +261,33 @@ fun LazyListScope.TreeLeaf(
                         Spacer(modifier = Modifier.size(8.dp))
                         Text(
                             maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f),
                             text = node.content.data.description.orEmpty()
                         )
-                        Column {
-                            Text(text = "${node.content.availableAmount} ${node.content.measureData?.name ?: ""}")
-                            Text(text = "${node.content.availableAmount} ${node.content.measureData?.name ?: ""}")
+                        if (order != null) {
+                            Column {
+                                Text(text = "${order.amount} ${order.godEntity.measureData?.name ?: ""}")
+                                Text(text = "${order.price} грн")
+                            }
                         }
+
                         Spacer(modifier = Modifier.size(8.dp))
                     }
                 }
 
-                if (order != null) {
+                if (!node.content.data.isFolder) {
                     Text(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(start = (24 + shiftSize).dp),
-                        text = "В заказe ${order.amount} ${order.godEntity.measureData?.name ?: ""} по цене ${order.price} грн"
+                        text = "На складе ${node.content.availableAmount} ${node.content.measureData?.name}"
+                    )
+                }
+
+                node.content.price.forEach {
+                    Text(
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(start = (24 + shiftSize).dp),
+                        text = "${it.priceTypeName}: ${it.priceValue} грн"
                     )
                 }
             }
@@ -297,9 +309,22 @@ fun PreviewGodSelectionScreen() {
                             description = "Папка 1"
                             isFolder = true
                         }), expanded = true, children = mutableListOf(
-                            TreeNode(GodEntity(GodsData().apply {
-                                description = "Файл 1"
-                            }, price = listOf(PriceData().apply { priceTypeName = "Оптовая цена" }, PriceData().apply { priceTypeName = "Розничная цена" }))), TreeNode(GodEntity(GodsData().apply {
+                            TreeNode(
+                                GodEntity(
+                                    GodsData().apply {
+                                        refKey = "123213"
+                                        description =
+                                            "Файл 1 длинное название кабеля ШВВП бла бла бла"
+                                    },
+                                    price = listOf(PriceData().apply {
+                                        priceTypeName = "Оптовая цена"
+                                        priceValue = 123F
+                                    }, PriceData().apply {
+                                        priceTypeName = "Розничная цена"
+                                        priceValue = 145F
+                                    })
+                                )
+                            ), TreeNode(GodEntity(GodsData().apply {
                                 description = "Файл 2"
                             })), TreeNode(GodEntity(GodsData().apply {
                                 description = "Файл 3"
@@ -307,6 +332,25 @@ fun PreviewGodSelectionScreen() {
                                 description = "Файл 4"
                             }))
                         )
+                    )
+                ),
+
+                orderTemplates = listOf(
+                    GodOrderTemplate(
+                        CustomerData(), GodEntity(
+                            GodsData().apply {
+                                refKey = "123213"
+                                description =
+                                    "Файл 1 длинное название кабеля ШВВП бла бла бла"
+                            },
+                            price = listOf(PriceData().apply {
+                                priceTypeName = "Оптовая цена"
+                                priceValue = 123F
+                            }, PriceData().apply {
+                                priceTypeName = "Розничная цена"
+                                priceValue = 145F
+                            })
+                        ), 123F, 555F
                     )
                 )
             )

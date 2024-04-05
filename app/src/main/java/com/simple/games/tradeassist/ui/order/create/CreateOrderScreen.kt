@@ -263,27 +263,27 @@ fun CreateOrderScreenContent(
                 }
 
                 item {
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = addGodsEnabled,
-                        onClick = { onAddGods() }) {
-                        Text(text = stringResource(id = R.string.add_god))
-                    }
-                }
+                    Column {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = addGodsEnabled,
+                            onClick = { onAddGods() }) {
+                            Text(text = stringResource(id = R.string.add_god))
+                        }
 
-                item {
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = addGodsEnabled,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                        onClick = { onSaveOrder() }) {
-                        if (addGodsEnabled) {
-                            Text(
-                                color = MaterialTheme.colorScheme.onErrorContainer,
-                                text = stringResource(R.string.save_order)
-                            )
-                        } else {
-                            Text(text = stringResource(R.string.save_order))
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = addGodsEnabled,
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                            onClick = { onSaveOrder() }) {
+                            if (addGodsEnabled) {
+                                Text(
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
+                                    text = stringResource(R.string.save_order)
+                                )
+                            } else {
+                                Text(text = stringResource(R.string.save_order))
+                            }
                         }
                     }
                 }

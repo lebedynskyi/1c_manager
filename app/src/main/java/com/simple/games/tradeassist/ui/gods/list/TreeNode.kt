@@ -8,6 +8,5 @@ data class TreeNode(
     val content: GodEntity,
     var children: MutableList<TreeNode> = mutableListOf(),
     @Deprecated("Do not use this flag")
-    var expanded: Boolean = false,
-    var godOrderData: GodOrderData? =null
+    var expanded: Boolean = false
 )

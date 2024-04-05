@@ -101,8 +101,6 @@ class GodInfoViewModel @Inject constructor(
         currentCustomer = customer
         currentGod = god
 
-        reduce { requestInProgress = true }
-
         c1Repository.getGod(god.data.refKey).onSuccess {
             reduce {
                 godsEntity = it
@@ -123,8 +121,6 @@ class GodInfoViewModel @Inject constructor(
                     }
                 }
         }
-
-        reduce { requestInProgress = false }
     }
 
     private fun handleBackClicked() {
