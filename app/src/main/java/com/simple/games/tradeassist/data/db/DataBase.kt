@@ -7,8 +7,8 @@ import com.simple.games.tradeassist.data.api.response.CustomersConverter
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.MeasureData
+import com.simple.games.tradeassist.data.api.response.PriceData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
-import com.simple.games.tradeassist.data.api.response.StorageData
 import com.simple.games.tradeassist.data.api.response.StorageRecordData
 import com.simple.games.tradeassist.domain.OrderConverter
 import com.simple.games.tradeassist.domain.OrderEntity
@@ -20,6 +20,7 @@ import com.simple.games.tradeassist.domain.OrderEntity
         GodsData::class,
         StorageRecordData::class,
         ResponsibleData::class,
+        PriceData::class,
         OrderEntity::class],
 )
 
@@ -31,4 +32,5 @@ abstract class DataBase : RoomDatabase() {
     abstract fun storageDao(): StorageDao
     abstract fun responsibleDao(): ResponsibleDao
     abstract fun ordersDao(): OrdersDao
+    abstract fun priceDao(): PriceDao
 }

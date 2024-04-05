@@ -8,6 +8,7 @@ import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.GodOrderData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.OrderHistoryData
+import com.simple.games.tradeassist.data.api.response.PriceData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.data.api.response.StorageRecordData
 import com.simple.games.tradeassist.data.db.DataBase
@@ -44,12 +45,14 @@ class C1Repository @Inject constructor(
             dataBase.storageDao().insertAll(it)
         }.chain { fetchGods() }.onSuccess {
             dataBase.godsDao().insertAll(it)
+        }.chain { fetchPrices() }.onSuccess {
+            dataBase.priceDao().insertAll(it)
         }.map {
             true
         }
     }
 
-    suspend fun syncStorage(){
+    suspend fun syncStorage() {
         fetchStorage().onSuccess {
             dataBase.withTransaction {
                 dataBase.storageDao().purge()
@@ -63,12 +66,14 @@ class C1Repository @Inject constructor(
         val measures = dataBase.measureDao().getAll()
         val storage = dataBase.storageDao().getAll().groupBy { it.godKey }
         val gods = dataBase.godsDao().getAll()
+        val prices = dataBase.priceDao().getAll().groupBy { it.godKey }
 
         val result = buildList {
             for (g in gods) {
                 val godMeasure = measures.firstOrNull { it.refKey == g.measureKey }
                 val godStorage = storage[g.refKey] ?: emptyList()
-                add(GodEntity(g, godMeasure, 0F, calculateAmount(godStorage)))
+                val godPrices = prices[g.refKey] ?: emptyList()
+                add(GodEntity(g, godMeasure, calculatePrice(godPrices), calculateAmount(godStorage)))
             }
         }
 
@@ -79,10 +84,12 @@ class C1Repository @Inject constructor(
         val measures = dataBase.measureDao().getAll()
         val storage = dataBase.storageDao().getAll().groupBy { it.godKey }
         val god = dataBase.godsDao().get(refKey) ?: return Result.success(null)
+        val prices = dataBase.priceDao().getAll().groupBy { it.godKey }
 
         val godMeasure = measures.firstOrNull { it.refKey == god.measureKey }
         val godStorage = storage[god.refKey] ?: emptyList()
-        val result = GodEntity(god, godMeasure, 0F, calculateAmount(godStorage))
+        val godPrices = prices[god.refKey] ?: emptyList()
+        val result = GodEntity(god, godMeasure, calculatePrice(godPrices), calculateAmount(godStorage))
 
         return Result.success(result)
     }
@@ -136,14 +143,19 @@ class C1Repository @Inject constructor(
     suspend fun publishOrder(
         order: OrderEntity
     ): Result<EmptyResponse> {
-        return apiDataSource.publishOrder(order.customerKey, order.responsibleKey, order.gods).onSuccess {
-            order.refKey = "Created"
-            dataBase.ordersDao().insertAll(order)
-        }
+        return apiDataSource.publishOrder(order.customerKey, order.responsibleKey, order.gods)
+            .onSuccess {
+                order.refKey = "Created"
+                dataBase.ordersDao().insertAll(order)
+            }
     }
 
     private suspend fun fetchResponsible(): Result<List<ResponsibleData>> {
         return apiDataSource.getResponsible()
+    }
+
+    private suspend fun fetchPrices(): Result<List<PriceData>> {
+        return apiDataSource.getPrices()
     }
 
     private suspend fun fetchGods(): Result<List<GodsData>> {
@@ -160,6 +172,10 @@ class C1Repository @Inject constructor(
 
     private suspend fun fetchMeasure(): Result<List<MeasureData>> {
         return apiDataSource.getMeasure()
+    }
+
+    private fun calculatePrice(godPrices: List<PriceData>): List<PriceData> {
+        return godPrices.sortedByDescending { it.date }.distinctBy { it.priceTypeKey }
     }
 
     private fun calculateAmount(storageRecordData: List<StorageRecordData>): Float {

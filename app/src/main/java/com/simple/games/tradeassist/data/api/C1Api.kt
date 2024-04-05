@@ -7,6 +7,8 @@ import com.simple.games.tradeassist.data.api.response.DataResponse
 import com.simple.games.tradeassist.data.api.response.EmptyResponse
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.OrderHistoryData
+import com.simple.games.tradeassist.data.api.response.PriceData
+import com.simple.games.tradeassist.data.api.response.PriceTypeData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.data.api.response.StorageData
 import retrofit2.Response
@@ -34,6 +36,12 @@ interface C1Api {
 
     @GET("Catalog_Пользователи?\$format=json")
     suspend fun fetchResponsible(@Header("Authorization") auth: String?): Response<DataResponse<ResponsibleData>>
+
+    @GET("InformationRegister_ЦеныНоменклатуры?\$format=json")
+    suspend fun fetchPrices(@Header("Authorization") auth: String?): Response<DataResponse<PriceData>>
+
+    @GET("Catalog_ВидыЦен?\$format=json")
+    suspend fun fetchPriceTypes(@Header("Authorization") auth: String?): Response<DataResponse<PriceTypeData>>
 
     @GET("Document_РасходнаяНакладная?\$format=json")
     suspend fun fetchOrderHistory(

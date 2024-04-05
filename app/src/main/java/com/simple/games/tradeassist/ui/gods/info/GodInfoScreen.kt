@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,6 +23,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +38,7 @@ import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.GodOrderData
 import com.simple.games.tradeassist.data.api.response.GodsData
+import com.simple.games.tradeassist.data.api.response.PriceData
 import com.simple.games.tradeassist.domain.GodEntity
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
@@ -129,9 +132,13 @@ fun GodInfoScreenContent(
 
             HorizontalDivider(thickness = 0.5.dp)
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(text = "На складе: ${godEntity.availableAmount}${godEntity.measureData?.name}")
-                Text(text = "Базовая цена: ???")
+            Text(text = "На складе: ${godEntity.availableAmount}${godEntity.measureData?.name}")
+            HorizontalDivider(thickness = 0.5.dp)
+
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                godEntity.price.forEach {
+                    Text(text = "${it.priceTypeName}: ${it.priceValue} грн")
+                }
             }
 
             HorizontalDivider(thickness = 0.5.dp)
@@ -147,6 +154,7 @@ fun GodInfoScreenContent(
                     onValueChange = {
                         onAmountChanged(it)
                     })
+
             }
 
             HorizontalDivider(thickness = 0.5.dp)
@@ -201,23 +209,29 @@ fun GodInfoScreenPreview() {
                     name = "шт"
                 },
                 availableAmount = 123F,
-                price = 100500F
+                price = listOf(PriceData().apply {
+                    this.priceValue = 10.6F
+                    this.priceTypeName = "Оптовая цена"
+                }, PriceData().apply {
+                    this.priceValue = 11.6F
+                    this.priceTypeName = "Актальная цена"
+                })
             ), orderHistory = buildList {
                 add("2024-03-28 16:57:09" to GodOrderData().apply {
                     price = 22F
                     amount = 133
-                    sum = 12333.0F
+                    sum = 1233.0F
                 })
 
                 add("2024-03-28 16:57:09" to GodOrderData().apply {
                     price = 22F
                     amount = 133
-                    sum = 12333.0F
+                    sum = 123.0F
                 })
                 add("2024-03-28 16:57:09" to GodOrderData().apply {
                     price = 22F
                     amount = 133
-                    sum = 12333.0F
+                    sum = 333.0F
                 })
             })
         )

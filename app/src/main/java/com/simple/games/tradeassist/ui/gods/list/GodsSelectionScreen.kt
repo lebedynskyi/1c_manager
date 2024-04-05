@@ -5,6 +5,7 @@ package com.simple.games.tradeassist.ui.gods.list
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +49,8 @@ import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.GodsData
+import com.simple.games.tradeassist.data.api.response.PriceData
+import com.simple.games.tradeassist.domain.GodEntity
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingContainer
 import com.simple.games.tradeassist.ui.base.design.verticalScrollbar
@@ -260,7 +263,10 @@ fun LazyListScope.TreeLeaf(
                             modifier = Modifier.weight(1f),
                             text = node.content.data.description.orEmpty()
                         )
-                        Text(text = "${node.content.availableAmount} ${node.content.measureData?.name ?: ""}")
+                        Column {
+                            Text(text = "${node.content.availableAmount} ${node.content.measureData?.name ?: ""}")
+                            Text(text = "${node.content.availableAmount} ${node.content.measureData?.name ?: ""}")
+                        }
                         Spacer(modifier = Modifier.size(8.dp))
                     }
                 }
@@ -276,5 +282,34 @@ fun LazyListScope.TreeLeaf(
 
             HorizontalDivider(thickness = 0.5.dp)
         }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewGodSelectionScreen() {
+    TradeAssistTheme {
+        GodsSelectionScreen(
+            state = GodsSelectionViewState(
+                godsList = listOf(
+                    TreeNode(
+                        GodEntity(GodsData().apply {
+                            description = "Папка 1"
+                            isFolder = true
+                        }), expanded = true, children = mutableListOf(
+                            TreeNode(GodEntity(GodsData().apply {
+                                description = "Файл 1"
+                            }, price = listOf(PriceData().apply { priceTypeName = "Оптовая цена" }, PriceData().apply { priceTypeName = "Розничная цена" }))), TreeNode(GodEntity(GodsData().apply {
+                                description = "Файл 2"
+                            })), TreeNode(GodEntity(GodsData().apply {
+                                description = "Файл 3"
+                            })), TreeNode(GodEntity(GodsData().apply {
+                                description = "Файл 4"
+                            }))
+                        )
+                    )
+                )
+            )
+        )
     }
 }

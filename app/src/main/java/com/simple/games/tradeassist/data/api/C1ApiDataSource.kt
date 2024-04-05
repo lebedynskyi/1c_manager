@@ -7,8 +7,10 @@ import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.EmptyResponse
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.OrderHistoryData
+import com.simple.games.tradeassist.data.api.response.PriceData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.data.api.response.StorageRecordData
+import com.simple.games.tradeassist.domain.chain
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import kotlinx.coroutines.CoroutineDispatcher
 import java.text.SimpleDateFormat
@@ -69,6 +71,17 @@ class C1ApiDataSource @Inject constructor(
 
     suspend fun getResponsible(): Result<List<ResponsibleData>> {
         return apiCall { c1Api.fetchResponsible(authKey) }.map { it.data }
+    }
+
+    suspend fun getPrices(): Result<List<PriceData>> {
+        return apiCall { c1Api.fetchPriceTypes(auth = authKey) }.map { it.data }.chain { types ->
+            apiCall { c1Api.fetchPrices(authKey) }.map { it.data }.onSuccess { prices ->
+                prices.forEach { price ->
+                    price.priceTypeName =
+                        types.firstOrNull { it.refKey == price.priceTypeKey }?.description
+                }
+            }
+        }
     }
 
     suspend fun getOrderHistory(customerKey: String): Result<List<OrderHistoryData>> {

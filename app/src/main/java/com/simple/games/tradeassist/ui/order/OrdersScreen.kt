@@ -37,6 +37,7 @@ import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.MeasureData
+import com.simple.games.tradeassist.data.api.response.PriceData
 import com.simple.games.tradeassist.domain.GodEntity
 import com.simple.games.tradeassist.domain.OrderEntity
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
@@ -242,7 +243,13 @@ fun PreviewOrdersScreen() {
                             MeasureData().apply {
                                 name = "шт"
                             },
-                            0F,
+                            price = listOf(PriceData().apply {
+                                this.priceValue = 10.6F
+                                this.priceTypeName = "Оптовая цена"
+                            }, PriceData().apply {
+                                this.priceValue = 11.6F
+                                this.priceTypeName = "Актальная цена"
+                            }),
                             0F
                         ),
                         13F,
@@ -255,7 +262,13 @@ fun PreviewOrdersScreen() {
                             MeasureData().apply {
                                 name = "шт"
                             },
-                            0F,
+                            price = listOf(PriceData().apply {
+                                this.priceValue = 10.6F
+                                this.priceTypeName = "Оптовая цена"
+                            }, PriceData().apply {
+                                this.priceValue = 11.6F
+                                this.priceTypeName = "Актальная цена"
+                            }),
                             0F
                         ),
                         5F,
