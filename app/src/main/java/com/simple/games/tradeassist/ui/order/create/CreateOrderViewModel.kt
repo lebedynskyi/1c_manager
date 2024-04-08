@@ -1,5 +1,6 @@
 package com.simple.games.tradeassist.ui.order.create
 
+import androidx.compose.material3.rememberBottomAppBarState
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
@@ -20,24 +21,21 @@ class CreateOrderViewModel @Inject constructor(
 
     private val loadedCustomers: MutableList<CustomerData> = mutableListOf()
     private val loadedResponsible: MutableList<ResponsibleData> = mutableListOf()
-    private val orderGods: MutableList<GodOrderTemplate> = mutableListOf()
 
-    private var selectedCustomer: CustomerData? = null
-    private var selectedResponsible: ResponsibleData? = null
-
+    private lateinit var currentDraft: OrderEntity
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
             is AppUIEvent.OnBackClicked -> handleBackClicked()
 
-            is CreateOrderUIEvent.OnScreenLoaded -> handleScreenLoaded()
+            is CreateOrderUIEvent.OnScreenLoaded -> handleScreenLoaded(event.draftId)
             is CreateOrderUIEvent.OnAddGods -> handleAddGods()
             is CreateOrderUIEvent.OnCustomerNameChange -> handleCustomerNameChange(event.name)
             is CreateOrderUIEvent.OnDismissCustomerDropDown -> handleDismissCustomerDropDown()
             is CreateOrderUIEvent.OnCustomerSelected -> handleCustomerSelected(event.customer)
             is CreateOrderUIEvent.OnResponsibleSelected -> handleResponsibleSelected(event.responsible)
-            is CreateOrderUIEvent.OnGodsAdded -> handleGodsAdded(event.gods)
-            is CreateOrderUIEvent.OnGodAdded -> handleGodAdded(event.god)
+//            is CreateOrderUIEvent.OnGodsAdded -> handleGodsAdded(event.gods)
+//            is CreateOrderUIEvent.OnGodAdded -> handleGodAdded(event.god)
             is CreateOrderUIEvent.OnGodRemoveClicked -> handleGodRemoved(event.god)
             is CreateOrderUIEvent.OnGodEditClick -> handleGodEdit(event.god)
             is CreateOrderUIEvent.SaveOrder -> handleSaveOrder()
@@ -45,81 +43,79 @@ class CreateOrderViewModel @Inject constructor(
 
         super.onUIEvent(event)
     }
+//
+//    private fun handleGodAdded(god: GodOrderTemplate) {
+//        reduce {
+//            orderTemplates = mutableListOf<GodOrderTemplate>().apply {
+//                orderGods.forEach {
+//                    if (it.godEntity.data.refKey == god.godEntity.data.refKey) {
+//                        add(god)
+//                    } else {
+//                        add(it)
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    private fun handleGodAdded(god: GodOrderTemplate) {
-        reduce {
-            orderTemplates = mutableListOf<GodOrderTemplate>().apply {
-                orderGods.forEach {
-                    if (it.godEntity.data.refKey == god.godEntity.data.refKey) {
-                        add(god)
-                    } else {
-                        add(it)
-                    }
-                }
-            }
-        }
-    }
+//
+//    private fun handleGodsAdded(gods: List<GodOrderTemplate>) = launch { state ->
+//        orderGods.addAll(gods)
+//
+//        reduce {
+//            orderTemplates = mutableListOf<GodOrderTemplate>().apply {
+//                orderGods.forEach {
+//                    add(it)
+//                }
+//            }
+//        }
+//    }
 
     private fun handleSaveOrder() = launch { state ->
-        val customer = selectedCustomer ?: return@launch
-        val gods = state.orderTemplates ?: return@launch
-
-        repository.saveOrder(OrderEntity().apply {
-            customerKey = customer.refKey
-            customerName = customer.description.orEmpty()
-            responsibleKey = selectedResponsible?.refKey.orEmpty()
-            responsibleName = selectedResponsible?.name.orEmpty()
-            this.gods = gods
-        }).onSuccess {
+        repository.saveOrder(currentDraft).onSuccess {
             navigate { toBack() }
         }
     }
 
-    private fun handleGodsAdded(gods: List<GodOrderTemplate>) = launch { state ->
-        orderGods.addAll(gods)
-
-        reduce {
-            orderTemplates = mutableListOf<GodOrderTemplate>().apply {
-                orderGods.forEach {
-                    add(it)
-                }
-            }
-        }
-    }
-
     private fun handleGodRemoved(god: GodOrderTemplate) = launch {
-        orderGods.remove(god)
+        currentDraft.gods = currentDraft.gods?.filter { it.godEntity.data.refKey != god.godEntity.data.refKey }
         reduce {
-            orderTemplates = mutableListOf<GodOrderTemplate>().apply {
-                orderGods.forEach {
-                    add(it)
-                }
-            }
+            orderTemplates = currentDraft.gods
         }
     }
 
-    private fun handleGodEdit(order: GodOrderTemplate) = launch { state ->
+    private fun handleGodEdit(godTemplate: GodOrderTemplate) = launch { state ->
         val customer = selectedCustomer ?: return@launch
         navigate {
-            toGodsInfo(customer, order.godEntity, order.amount, order.price)
+            toGodsInfo(customer, godTemplate.godEntity, godTemplate.amount, godTemplate.price)
         }
     }
-    private fun handleResponsibleSelected(responsible: ResponsibleData) {
-        selectedResponsible = responsible
 
+    private fun handleAddGods() = launch { state ->
+        val customer = selectedCustomer ?: return@launch
+        navigate { toGodsSelection(customer) }
+    }
+
+    private fun handleResponsibleSelected(responsible: ResponsibleData) = launch{
         reduce {
             responsibleName = responsible.name
         }
+
+        currentDraft.responsibleKey = responsible.refKey
+        currentDraft.responsibleName = responsible.name
+        repository.saveOrder(currentDraft)
     }
 
-    private fun handleCustomerSelected(customer: CustomerData) {
-        selectedCustomer = customer
-
+    private fun handleCustomerSelected(customer: CustomerData) = launch{
         reduce {
             addGodsEnabled = true
             customerName = customer.description.orEmpty()
             filteredCustomers = emptyList()
         }
+
+        currentDraft.customerKey = customer.refKey
+        currentDraft.customerName = customer.description
+        repository.saveOrder(currentDraft)
     }
 
     private fun handleDismissCustomerDropDown() {
@@ -134,16 +130,25 @@ class CreateOrderViewModel @Inject constructor(
         } else {
             loadedCustomers.filter { it.description?.contains(name, true) == true }
         }
+
         reduce {
             customerName = name
             filteredCustomers = filtered.take(8)
-            selectedCustomer = null
             addGodsEnabled = false
+        }
+
+        launch {
+            currentDraft.customerName = null
+            currentDraft.customerKey = null
+
+            repository.saveOrder(currentDraft)
         }
     }
 
-    private fun handleScreenLoaded() = launch {
+    private fun handleScreenLoaded(draftId: Long) = launch {
         reduce { requestInProgress = true }
+
+        currentDraft = repository.getDraft(draftId)
 
         if (loadedCustomers.isEmpty()) {
             repository.getCustomers().onSuccess {
@@ -156,24 +161,20 @@ class CreateOrderViewModel @Inject constructor(
             repository.getResponsible().onSuccess {
                 loadedResponsible.clear()
                 loadedResponsible.addAll(it)
-
-                selectedResponsible = it.firstOrNull()
-
-                reduce {
-                    responsible = it
-                }
             }
         }
 
-        reduce { requestInProgress = false }
+        reduce {
+            customerName = currentDraft.customerName.orEmpty()
+            responsibleName = currentDraft.responsibleName
+            orderTemplates = currentDraft.gods
+            responsible = loadedResponsible
+            requestInProgress = false
+            addGodsEnabled = !currentDraft.customerKey.isNullOrBlank()
+        }
     }
 
     private fun handleBackClicked() = launch {
         navigate { toBack() }
-    }
-
-    private fun handleAddGods() = launch { state ->
-        val customer = selectedCustomer ?: return@launch
-        navigate { toGodsSelection(customer) }
     }
 }

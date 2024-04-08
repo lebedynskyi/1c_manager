@@ -15,6 +15,9 @@ interface OrdersDao {
     @Query("SELECT * FROM orders WHERE refKey is NULL")
     suspend fun getDrafts(): List<OrderEntity>
 
+    @Query("SELECT * FROM orders WHERE refKey is NULL AND localId = :localId")
+    suspend fun getDraft(localId: Long): OrderEntity
+
     @Query("SELECT * FROM orders WHERE refKey is not NULL")
     suspend fun getPublished(): List<OrderEntity>
 
@@ -22,7 +25,7 @@ interface OrdersDao {
     suspend fun insertAll(customers: List<OrderEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(vararg customers: OrderEntity)
+    suspend fun insert(order: OrderEntity) : Long
 
     @Delete
     suspend fun delete(customers: OrderEntity)

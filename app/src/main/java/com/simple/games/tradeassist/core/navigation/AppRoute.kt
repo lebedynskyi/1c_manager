@@ -32,5 +32,6 @@ sealed class AppRoute {
 
     object CreateOrder {
         val route = "CreateOrders"
+        val argDraftId = "CreateOrdersDraftId"
     }
 }

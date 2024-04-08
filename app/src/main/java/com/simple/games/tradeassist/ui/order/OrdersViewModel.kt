@@ -23,7 +23,7 @@ class OrdersViewModel @Inject constructor(
             is OrdersUIEvent.OnHistoryClicked -> handleOnHistoryClick()
             is OrdersUIEvent.OnPublishClick -> handlePublishClick(event.order)
             is OrdersUIEvent.OnDeleteClick -> handleOnDeleteClick(event.order)
-            is OrdersUIEvent.OnEditClick -> {}
+            is OrdersUIEvent.OnEditClick -> handleEditClick(event.order)
         }
         super.onUIEvent(event)
     }
@@ -38,6 +38,12 @@ class OrdersViewModel @Inject constructor(
                 orders = it
                 requestInProgress = false
             }
+        }
+    }
+
+    private fun handleEditClick(order: OrderEntity) = launch{
+        navigate {
+            toCreateOrder(order.id)
         }
     }
 
@@ -62,7 +68,10 @@ class OrdersViewModel @Inject constructor(
 
     private fun handleCreateOrder() = launch {
         navigate {
-            toCreateOrder()
+            val newOrder = OrderEntity()
+            repository.saveOrder(newOrder).onSuccess {
+                toCreateOrder(it)
+            }
         }
     }
 

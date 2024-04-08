@@ -153,22 +153,29 @@ fun initialize() : Boolean {
         return Result.success(orders)
     }
 
-    suspend fun saveOrder(template: OrderEntity): Result<Unit> {
-        dataBase.ordersDao().insertAll(template)
-        return Result.success(Unit)
+    suspend fun saveOrder(template: OrderEntity): Result<Long> {
+        return Result.success(dataBase.ordersDao().insert(template))
     }
 
     suspend fun deleteOrder(order: OrderEntity) {
         dataBase.ordersDao().delete(order)
     }
 
+    suspend fun getDraft(draftId: Long): OrderEntity {
+        return dataBase.ordersDao().getDraft(draftId)
+    }
+
     suspend fun publishOrder(
         order: OrderEntity
     ): Result<EmptyResponse> {
-        return apiDataSource.publishOrder(order.customerKey, order.responsibleKey, order.gods)
+        val customer = order.customerKey?: return Result.failure(IllegalArgumentException("Customer is null"))
+        val responsible = order.responsibleKey?: return Result.failure(IllegalArgumentException("Responsible is null"))
+        val gods = order.gods?: return Result.failure(IllegalArgumentException("Gods is null"))
+
+        return apiDataSource.publishOrder(customer, responsible, gods)
             .onSuccess {
-                order.refKey = "Created"
-                dataBase.ordersDao().insertAll(order)
+                order.refKey = "TODO"
+                dataBase.ordersDao().insert(order)
             }
     }
 

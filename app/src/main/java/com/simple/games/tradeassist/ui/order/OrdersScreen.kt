@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.R
+import com.simple.games.tradeassist.core.orDefault
 import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
@@ -170,16 +171,16 @@ private fun OrderItem(
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = order.customerName, style = MaterialTheme.typography.titleLarge)
+            Text(text = order.customerName.orDefault("Нет заказчика"), style = MaterialTheme.typography.titleLarge)
             HorizontalDivider(thickness = 0.5.dp)
             Row {
                 Text(text = "Ответственный: ")
-                Text(text = order.responsibleName, style = MaterialTheme.typography.titleMedium)
+                Text(text = order.responsibleName.orDefault("Не указан"), style = MaterialTheme.typography.titleMedium)
             }
             HorizontalDivider(thickness = 0.5.dp)
             if (order.refKey.isNullOrBlank()) {
                 Column {
-                    order.gods.forEach {
+                    order.gods.orEmpty().forEach {
                         Text(
                             text = "${it.godEntity.data.description}",
                             style = MaterialTheme.typography.titleMedium
@@ -195,7 +196,7 @@ private fun OrderItem(
             Row {
                 Text(text = "Общая сумма заказа: ")
                 Text(
-                    text = "${order.gods.map { it.sum }.sum()} грн",
+                    text = "${order.gods.orEmpty().map { it.sum }.sum()} грн",
                     style = MaterialTheme.typography.titleMedium
                 )
             }

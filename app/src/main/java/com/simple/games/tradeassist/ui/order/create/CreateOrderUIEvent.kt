@@ -6,7 +6,7 @@ import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 
 sealed class CreateOrderUIEvent : AppUIEvent() {
-    data object OnScreenLoaded: CreateOrderUIEvent()
+    data class  OnScreenLoaded(val draftId: Long): CreateOrderUIEvent()
     object OnAddGods: CreateOrderUIEvent()
     object SaveOrder: CreateOrderUIEvent()
     object OnDismissCustomerDropDown: CreateOrderUIEvent()

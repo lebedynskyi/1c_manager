@@ -71,7 +71,8 @@ fun NavGraphBuilder.applicationListNavGraph(
         val state by viewModel.viewState.collectAsState()
 
         LaunchedEffect(key1 = Unit) {
-            viewModel.onUIEvent(CreateOrderUIEvent.OnScreenLoaded)
+            val localOrderId = controller.getArgument<Long?>(AppRoute.CreateOrder.argDraftId) ?: return@LaunchedEffect
+            viewModel.onUIEvent(CreateOrderUIEvent.OnScreenLoaded(localOrderId))
 
             controller.getResult<List<GodOrderTemplate>>(AppRoute.GodsSelectionRoute.resultSelectedGods)?.let {
                 viewModel.onUIEvent(CreateOrderUIEvent.OnGodsAdded(it))

@@ -12,21 +12,25 @@ import kotlinx.serialization.json.Json
 class OrderEntity {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo("localId")
-    var id: Int = 0
+    var id: Long = 0
 
     @ColumnInfo("refKey")
     var refKey: String? = null
 
     @ColumnInfo("customerKey")
-    lateinit var customerKey: String
+    var customerKey: String? = null
+
     @ColumnInfo("customerName")
-    lateinit var customerName: String
+    var customerName: String? = null
+
     @ColumnInfo("responsibleKey")
-    lateinit var responsibleKey: String
+    var responsibleKey: String?= null
+
     @ColumnInfo("responsibleName")
-    lateinit var responsibleName: String
+    var responsibleName: String? = null
+
     @ColumnInfo("gods")
-    lateinit var gods: List<GodOrderTemplate>
+    var gods: List<GodOrderTemplate>? = null
 }
 
 class OrderConverter {

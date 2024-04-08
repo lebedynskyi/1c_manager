@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import androidx.navigation.NavHostController
 import com.simple.games.tradeassist.data.api.response.CustomerData
-import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.domain.GodEntity
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -56,7 +55,8 @@ class Navigator @Inject constructor() {
         controller?.navigate(AppRoute.OrdersRoute.route)
     }
 
-    fun toCreateOrder() {
+    fun toCreateOrder(localId: Long) {
+        controller?.putArgument(AppRoute.CreateOrder.argDraftId, localId)
         controller?.navigate(AppRoute.CreateOrder.route)
     }
 }
