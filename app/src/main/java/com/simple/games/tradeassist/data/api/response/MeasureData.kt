@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 @Entity(tableName = "measure")
 @Serializable
-class MeasureData {
+class MeasureData : java.io.Serializable {
     @ColumnInfo("refKey")
     @PrimaryKey
     @SerialName("Ref_Key")

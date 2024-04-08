@@ -38,14 +38,15 @@ class Navigator @Inject constructor() {
         }
     }
 
-    fun toGodsSelection(customer: CustomerData? = null) {
-        controller?.putArgument(AppRoute.GodsSelectionRoute.argCustomer, customer)
+    fun toGodsSelection(orderId: Long? = null) {
+        controller?.putArgument(AppRoute.GodsSelectionRoute.argOrderId, orderId)
         controller?.navigate(AppRoute.GodsSelectionRoute.route)
     }
 
-    fun toGodsInfo(customer: CustomerData?, god: GodEntity, amount: Float? = null, price: Float? = null) {
+    fun toGodsInfo(god: GodEntity,customerName: String? = null, customerKey: String? = null, amount: Float? = null, price: Float? = null) {
         controller?.putArgument(AppRoute.GodsInfoRoute.argGods, god)
-        controller?.putArgument(AppRoute.GodsInfoRoute.argCustomer, customer)
+        controller?.putArgument(AppRoute.GodsInfoRoute.argCustomerKey, customerKey)
+        controller?.putArgument(AppRoute.GodsInfoRoute.argCustomerName, customerName)
         controller?.putArgument(AppRoute.GodsInfoRoute.argAmount, amount)
         controller?.putArgument(AppRoute.GodsInfoRoute.argPrice, price)
         controller?.navigate(AppRoute.GodsInfoRoute.route)

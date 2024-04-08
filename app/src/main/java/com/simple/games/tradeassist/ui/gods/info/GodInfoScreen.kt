@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -23,7 +22,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,11 +67,14 @@ fun GodInfoScreen(
                 }
             })
     }) {
-        GodInfoScreenContent(state.amount.orEmpty(),
-            state.price.orEmpty(),
+        GodInfoScreenContent(
+            state.amountInput.orEmpty(),
+            state.priceInput.orEmpty(),
+            state.priceMarga,
             state.addBtnEnabled,
             state.godsEntity,
             state.orderHistory,
+            state.historyName,
             modifier = Modifier.padding(it),
             onAmountChanged = { onUIEvent(GodInfoUIEvent.OnAmountChanged(it)) },
             onPriceChanged = { onUIEvent(GodInfoUIEvent.OnPriceChanged(it)) },
@@ -87,9 +88,11 @@ fun GodInfoScreen(
 fun GodInfoScreenContent(
     amount: String,
     price: String,
+    marga: Double,
     addBtnEnabled: Boolean,
     godEntity: GodEntity?,
     orderHistory: List<Pair<String, GodOrderData>>?,
+    historyName: String?,
     modifier: Modifier = Modifier,
     onAmountChanged: (String) -> Unit = {},
     onPriceChanged: (String) -> Unit = {},
@@ -136,8 +139,19 @@ fun GodInfoScreenContent(
             HorizontalDivider(thickness = 0.5.dp)
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                godEntity.price.forEach {
-                    Text(text = "${it.priceTypeName}: ${it.priceValue} грн")
+                godEntity.price.forEachIndexed { index, it ->
+                    Row {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1F),
+                            text = "${it.priceTypeName}: ${it.priceValue} грн"
+                        )
+
+                        if (index == godEntity.price.size - 1) {
+                            Text(text = "Р=$marga%")
+                        }
+                    }
                 }
             }
 
@@ -173,7 +187,7 @@ fun GodInfoScreenContent(
             }
 
             HorizontalDivider(thickness = 0.5.dp)
-            Text(text = "История покупок:")
+            Text(text = "История $historyName:")
 
             for ((date, god) in orderHistory.orEmpty()) {
                 Row {
@@ -200,40 +214,42 @@ fun GodInfoScreenContent(
 fun GodInfoScreenPreview() {
     TradeAssistTheme {
         GodInfoScreen(
-            state = GodInfoViewState(godsEntity = GodEntity(
-                GodsData().apply {
-                    description =
-                        "Длинное название товара для стройки и заметания двора. Супер дупер тряпк швабра. Ну очень длинно енвазиние"
-                },
-                measureData = MeasureData().apply {
-                    name = "шт"
-                },
-                availableAmount = 123F,
-                price = listOf(PriceData().apply {
-                    this.priceValue = 10.6F
-                    this.priceTypeName = "Оптовая цена"
-                }, PriceData().apply {
-                    this.priceValue = 11.6F
-                    this.priceTypeName = "Актальная цена"
-                })
-            ), orderHistory = buildList {
-                add("2024-03-28 16:57:09" to GodOrderData().apply {
-                    price = 22F
-                    amount = 133
-                    sum = 1233.0F
-                })
+            state = GodInfoViewState(
+                priceInput = "12.4",
+                godsEntity = GodEntity(
+                    GodsData().apply {
+                        description =
+                            "Длинное название товара для стройки и заметания двора. Супер дупер тряпк швабра. Ну очень длинно енвазиние"
+                    },
+                    measureData = MeasureData().apply {
+                        name = "шт"
+                    },
+                    availableAmount = 123F,
+                    price = listOf(PriceData().apply {
+                        this.priceValue = 10.6F
+                        this.priceTypeName = "Оптовая цена"
+                    }, PriceData().apply {
+                        this.priceValue = 11.6F
+                        this.priceTypeName = "Актальная цена"
+                    })
+                ), orderHistory = buildList {
+                    add("2024-03-28 16:57:09" to GodOrderData().apply {
+                        price = 22F
+                        amount = 133
+                        sum = 1233.0F
+                    })
 
-                add("2024-03-28 16:57:09" to GodOrderData().apply {
-                    price = 22F
-                    amount = 133
-                    sum = 123.0F
+                    add("2024-03-28 16:57:09" to GodOrderData().apply {
+                        price = 22F
+                        amount = 133
+                        sum = 123.0F
+                    })
+                    add("2024-03-28 16:57:09" to GodOrderData().apply {
+                        price = 22F
+                        amount = 133
+                        sum = 333.0F
+                    })
                 })
-                add("2024-03-28 16:57:09" to GodOrderData().apply {
-                    price = 22F
-                    amount = 133
-                    sum = 333.0F
-                })
-            })
         )
     }
 }

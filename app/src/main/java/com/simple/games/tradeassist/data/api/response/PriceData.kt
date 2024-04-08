@@ -9,7 +9,7 @@ import kotlinx.serialization.Transient
 
 @Entity("price")
 @Serializable
-class PriceData {
+class PriceData(): java.io.Serializable {
     @ColumnInfo
     @PrimaryKey(autoGenerate = true)
     var localId: Int = 0
@@ -39,7 +39,7 @@ class PriceData {
 }
 
 @Serializable
-class PriceTypeData {
+class PriceTypeData : java.io.Serializable{
     @SerialName("Ref_Key")
     lateinit var refKey: String
 

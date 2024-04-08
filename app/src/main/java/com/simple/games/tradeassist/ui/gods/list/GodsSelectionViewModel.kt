@@ -5,6 +5,7 @@ import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.domain.GodEntity
+import com.simple.games.tradeassist.domain.OrderEntity
 import com.simple.games.tradeassist.ui.base.AppViewModel
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,14 +21,12 @@ class GodsSelectionViewModel @Inject constructor(
     private var loadedGods: List<GodEntity> = emptyList()
     private var filteredTree: List<TreeNode> = emptyList()
     private var fullTree: List<TreeNode> = emptyList()
-    private var customer: CustomerData? = null
-
-    private val orders = mutableListOf<GodOrderTemplate>()
+    private var currentOrder: OrderEntity? = null
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
             is AppUIEvent.OnBackClicked -> handleBackClicked()
-            is GodsSelectionUIEvent.OnScreenLoaded -> handleScreenLoaded(event.customer)
+            is GodsSelectionUIEvent.OnScreenLoaded -> handleScreenLoaded(event.orderId)
             is GodsSelectionUIEvent.OnDoneClick -> handleDoneClicked()
             is GodsSelectionUIEvent.OnCollapseClick -> handleCollapseClicked()
             is GodsSelectionUIEvent.OnShowAllToggleChanged -> handleShowAllToggle(event.showAll)
@@ -49,7 +48,7 @@ class GodsSelectionViewModel @Inject constructor(
 
     private fun handleDoneClicked() = launch {
         navigate {
-            toBack(AppRoute.GodsSelectionRoute.resultSelectedGods to orders)
+            toBack()
         }
     }
 
@@ -63,45 +62,50 @@ class GodsSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun handleScreenLoaded(customer: CustomerData?) = launch {
+    private fun handleScreenLoaded(orderId: Long?) = launch {
         if (loadedGods.isNotEmpty()) {
             return@launch
         }
 
-        this.customer = customer
-        reduce {
-            contentInProgress = true
-        }
+        reduce { contentInProgress = true }
+
+        currentOrder = orderId?.let { repository.getDraft(it) }
+
         repository.getGods().onSuccess {
             loadedGods = it
+
             filteredTree = buildTree(it, fullMode = false)
-            reduce {
-                godsList = filteredTree
-            }
         }
 
         reduce {
+            orderTemplates = currentOrder?.gods
+            godsList = filteredTree
             contentInProgress = false
         }
 
-        delay(500)
+        delay(300)
         fullTree = buildTree(loadedGods, fullMode = true)
     }
 
-    private fun handleGodOrderAdded(orderTemplate: GodOrderTemplate) {
-        orders.add(orderTemplate)
-        reduce {
-            this.orderTemplates = mutableListOf<GodOrderTemplate>().apply {
-                orders.forEach {
-                    add(it)
-                }
-            }
-        }
+    private fun handleGodOrderAdded(orderTemplate: GodOrderTemplate) = launch {
+       currentOrder?.let {
+           it.gods = buildList {
+               addAll(it.gods.orEmpty().filter { it.godEntity.data.refKey != orderTemplate.godEntity.data.refKey })
+               add(orderTemplate)
+           }
+
+           repository.saveOrder(it)
+
+           reduce {
+               orderTemplates = it.gods
+           }
+       }
     }
 
     private fun handleGodsClicked(node: TreeNode) = launch {
         navigate {
-            toGodsInfo(customer, node.content)
+            val addedGod = currentOrder?.gods?.firstOrNull { it.godEntity.data.refKey == node.content.data.refKey }
+            toGodsInfo(node.content, currentOrder?.customerName, currentOrder?.customerKey, addedGod?.amount, addedGod?.price)
         }
     }
 

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
-class OrderHistoryData {
+class OrderHistoryData :java.io.Serializable{
     @SerialName("Ref_Key")
     lateinit var refKey: String
 
@@ -17,7 +17,7 @@ class OrderHistoryData {
 }
 
 @Serializable
-class GodOrderData {
+class GodOrderData: java.io.Serializable {
     @SerialName("Номенклатура_Key")
     lateinit var refKey: String
 

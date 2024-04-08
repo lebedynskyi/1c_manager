@@ -1,6 +1,5 @@
 package com.simple.games.tradeassist.ui.order.create
 
-import androidx.compose.material3.rememberBottomAppBarState
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
@@ -9,6 +8,7 @@ import com.simple.games.tradeassist.domain.OrderEntity
 import com.simple.games.tradeassist.ui.base.AppViewModel
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +23,8 @@ class CreateOrderViewModel @Inject constructor(
     private val loadedResponsible: MutableList<ResponsibleData> = mutableListOf()
 
     private lateinit var currentDraft: OrderEntity
+    private var saveJob : Job? = null
+
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
@@ -34,8 +36,6 @@ class CreateOrderViewModel @Inject constructor(
             is CreateOrderUIEvent.OnDismissCustomerDropDown -> handleDismissCustomerDropDown()
             is CreateOrderUIEvent.OnCustomerSelected -> handleCustomerSelected(event.customer)
             is CreateOrderUIEvent.OnResponsibleSelected -> handleResponsibleSelected(event.responsible)
-//            is CreateOrderUIEvent.OnGodsAdded -> handleGodsAdded(event.gods)
-//            is CreateOrderUIEvent.OnGodAdded -> handleGodAdded(event.god)
             is CreateOrderUIEvent.OnGodRemoveClicked -> handleGodRemoved(event.god)
             is CreateOrderUIEvent.OnGodEditClick -> handleGodEdit(event.god)
             is CreateOrderUIEvent.SaveOrder -> handleSaveOrder()
@@ -43,33 +43,6 @@ class CreateOrderViewModel @Inject constructor(
 
         super.onUIEvent(event)
     }
-//
-//    private fun handleGodAdded(god: GodOrderTemplate) {
-//        reduce {
-//            orderTemplates = mutableListOf<GodOrderTemplate>().apply {
-//                orderGods.forEach {
-//                    if (it.godEntity.data.refKey == god.godEntity.data.refKey) {
-//                        add(god)
-//                    } else {
-//                        add(it)
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-//
-//    private fun handleGodsAdded(gods: List<GodOrderTemplate>) = launch { state ->
-//        orderGods.addAll(gods)
-//
-//        reduce {
-//            orderTemplates = mutableListOf<GodOrderTemplate>().apply {
-//                orderGods.forEach {
-//                    add(it)
-//                }
-//            }
-//        }
-//    }
 
     private fun handleSaveOrder() = launch { state ->
         repository.saveOrder(currentDraft).onSuccess {
@@ -78,25 +51,32 @@ class CreateOrderViewModel @Inject constructor(
     }
 
     private fun handleGodRemoved(god: GodOrderTemplate) = launch {
-        currentDraft.gods = currentDraft.gods?.filter { it.godEntity.data.refKey != god.godEntity.data.refKey }
+        currentDraft.gods =
+            currentDraft.gods?.filter { it.godEntity.data.refKey != god.godEntity.data.refKey }
         reduce {
             orderTemplates = currentDraft.gods
         }
+
+        repository.saveOrder(currentDraft)
     }
 
     private fun handleGodEdit(godTemplate: GodOrderTemplate) = launch { state ->
-        val customer = selectedCustomer ?: return@launch
         navigate {
-            toGodsInfo(customer, godTemplate.godEntity, godTemplate.amount, godTemplate.price)
+            toGodsInfo(
+                godTemplate.godEntity,
+                currentDraft.customerName,
+                currentDraft.customerKey,
+                godTemplate.amount,
+                godTemplate.price
+            )
         }
     }
 
     private fun handleAddGods() = launch { state ->
-        val customer = selectedCustomer ?: return@launch
-        navigate { toGodsSelection(customer) }
+        navigate { toGodsSelection(currentDraft.id) }
     }
 
-    private fun handleResponsibleSelected(responsible: ResponsibleData) = launch{
+    private fun handleResponsibleSelected(responsible: ResponsibleData) = launch {
         reduce {
             responsibleName = responsible.name
         }
@@ -106,7 +86,7 @@ class CreateOrderViewModel @Inject constructor(
         repository.saveOrder(currentDraft)
     }
 
-    private fun handleCustomerSelected(customer: CustomerData) = launch{
+    private fun handleCustomerSelected(customer: CustomerData) = launch {
         reduce {
             addGodsEnabled = true
             customerName = customer.description.orEmpty()
@@ -147,6 +127,8 @@ class CreateOrderViewModel @Inject constructor(
 
     private fun handleScreenLoaded(draftId: Long) = launch {
         reduce { requestInProgress = true }
+
+        saveJob?.join()
 
         currentDraft = repository.getDraft(draftId)
 

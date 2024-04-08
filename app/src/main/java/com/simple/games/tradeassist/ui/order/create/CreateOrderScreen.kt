@@ -425,8 +425,7 @@ fun PreviewCreateOrder() {
                 filteredCustomers = listOf(CustomerData().apply { description = "Helo world" }),
                 orderTemplates = buildList {
                     add(
-                        GodOrderTemplate(
-                            CustomerData(), GodEntity(
+                        GodOrderTemplate(GodEntity(
                                 data = GodsData().apply {
                                     refKey = "122"
                                     description = "Кабель 2х234"

@@ -8,9 +8,11 @@ data class GodInfoViewState(
     override var requestInProgress: Boolean = false,
     var godsEntity: GodEntity? = null,
     var orderHistory: List<Pair<String, GodOrderData>>? = null,
+    var historyName: String? = null,
     var addBtnEnabled: Boolean = false,
-    var amount: String? = null,
+    var amountInput: String? = null,
     var amountError: Boolean = false,
-    var price: String? = null,
+    var priceMarga: Double = 0.0,
+    var priceInput: String? = null,
     var priceError: Boolean = false
 ) : AppViewState()

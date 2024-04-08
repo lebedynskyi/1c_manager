@@ -5,7 +5,7 @@ import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 
 sealed class GodsSelectionUIEvent : AppUIEvent() {
-    class OnScreenLoaded(val customer: CustomerData?) : GodsSelectionUIEvent()
+    class OnScreenLoaded(val orderId: Long?) : GodsSelectionUIEvent()
     class OnShowAllToggleChanged(val showAll: Boolean) : GodsSelectionUIEvent()
     class OnFilterQueryChanged(val query: String) : GodsSelectionUIEvent()
     class OnGodsClicked(val node: TreeNode) : GodsSelectionUIEvent()

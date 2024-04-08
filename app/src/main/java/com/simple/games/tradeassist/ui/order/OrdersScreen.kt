@@ -171,11 +171,17 @@ private fun OrderItem(
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = order.customerName.orDefault("Нет заказчика"), style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = order.customerName.orDefault("Нет заказчика"),
+                style = MaterialTheme.typography.titleLarge
+            )
             HorizontalDivider(thickness = 0.5.dp)
             Row {
                 Text(text = "Ответственный: ")
-                Text(text = order.responsibleName.orDefault("Не указан"), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = order.responsibleName.orDefault("Не указан"),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
             HorizontalDivider(thickness = 0.5.dp)
             if (order.refKey.isNullOrBlank()) {
@@ -203,20 +209,26 @@ private fun OrderItem(
             HorizontalDivider(thickness = 0.5.dp)
 
             if (order.refKey.isNullOrBlank()) {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    onClick = { onDeleteClick(order) }) {
-                    Text(text = "Удалить")
-                }
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                    onClick = { onEditClick(order) }) {
-                    Text(
-                        text = "Редактировать",
-                        color = MaterialTheme.colorScheme.onErrorContainer
-                    )
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1F),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        onClick = { onDeleteClick(order) }) {
+                        Text(text = "Удалить")
+                    }
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1F),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                        onClick = { onEditClick(order) }) {
+                        Text(
+                            text = "Редактировать",
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
                 }
 
                 Button(modifier = Modifier.fillMaxWidth(), onClick = { onPublishClick(order) }) {
@@ -233,12 +245,10 @@ fun PreviewOrdersScreen() {
     TradeAssistTheme {
         OrdersScreen(state = OrdersViewState(0, orders = listOf(
             OrderEntity().apply {
-                refKey = "das"
                 customerName = "ФОП Скай лаб моторс покупатель"
                 responsibleName = "Алина"
                 gods = listOf(
                     GodOrderTemplate(
-                        CustomerData(),
                         GodEntity(
                             GodsData().apply { description = "Кабель ШВВП 2х25" },
                             MeasureData().apply {
@@ -257,7 +267,6 @@ fun PreviewOrdersScreen() {
                         222F
                     ),
                     GodOrderTemplate(
-                        CustomerData(),
                         GodEntity(
                             GodsData().apply { description = "Провод 100м бухта 3х6" },
                             MeasureData().apply {

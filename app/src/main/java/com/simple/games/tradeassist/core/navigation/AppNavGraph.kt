@@ -7,8 +7,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.simple.games.tradeassist.data.api.response.CustomerData
-import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.domain.GodEntity
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import com.simple.games.tradeassist.ui.gods.info.GodInfoScreen
@@ -79,7 +77,7 @@ fun NavGraphBuilder.applicationListNavGraph(
             }
 
             controller.getResult<GodOrderTemplate>(AppRoute.GodsInfoRoute.resultOrder)?.let {
-                viewModel.onUIEvent(CreateOrderUIEvent.OnGodAdded(it))
+                viewModel.onUIEvent(CreateOrderUIEvent.OnGodEdited(it))
             }
         }
 
@@ -91,8 +89,8 @@ fun NavGraphBuilder.applicationListNavGraph(
         val state by viewModel.viewState.collectAsState()
 
         LaunchedEffect(key1 = Unit) {
-            val customer = controller.getArgument<CustomerData?>(AppRoute.GodsSelectionRoute.argCustomer)
-            viewModel.onUIEvent(GodsSelectionUIEvent.OnScreenLoaded(customer))
+            val orderId = controller.getArgument<Long?>(AppRoute.GodsSelectionRoute.argOrderId)
+            viewModel.onUIEvent(GodsSelectionUIEvent.OnScreenLoaded(orderId))
 
             controller.getResult<GodOrderTemplate>(AppRoute.GodsInfoRoute.resultOrder)?.let {
                 viewModel.onUIEvent(GodsSelectionUIEvent.OnAddGodOrder(it))
@@ -107,11 +105,12 @@ fun NavGraphBuilder.applicationListNavGraph(
         val state by viewModel.viewState.collectAsState()
 
         LaunchedEffect(key1 = Unit) {
-            val customer = controller.getArgument<CustomerData>(AppRoute.GodsInfoRoute.argCustomer) ?: return@LaunchedEffect
             val god = controller.getArgument<GodEntity>(AppRoute.GodsInfoRoute.argGods) ?: return@LaunchedEffect
+            val customerKey = controller.getArgument<String?>(AppRoute.GodsInfoRoute.argCustomerKey)
+            val customerName = controller.getArgument<String?>(AppRoute.GodsInfoRoute.argCustomerName)
             val price = controller.getArgument<Float?>(AppRoute.GodsInfoRoute.argPrice)
             val amount = controller.getArgument<Float?>(AppRoute.GodsInfoRoute.argAmount)
-            viewModel.onUIEvent(GodInfoUIEvent.OnScreenLoaded(customer, god, price, amount))
+            viewModel.onUIEvent(GodInfoUIEvent.OnScreenLoaded(god, customerName, customerKey, price, amount))
         }
 
         GodInfoScreen(state, onUIEvent = viewModel::onUIEvent)

@@ -336,8 +336,7 @@ fun PreviewGodSelectionScreen() {
                 ),
 
                 orderTemplates = listOf(
-                    GodOrderTemplate(
-                        CustomerData(), GodEntity(
+                    GodOrderTemplate(GodEntity(
                             GodsData().apply {
                                 refKey = "123213"
                                 description =
