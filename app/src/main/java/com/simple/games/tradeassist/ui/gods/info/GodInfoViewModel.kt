@@ -136,6 +136,8 @@ class GodInfoViewModel @Inject constructor(
                         this.priceInput = max.toString()
                         priceMarga = ((max - min) / (min / 100.0)).round(2)
                     }
+                } else if (enteredPrice != null){
+                    priceInput = enteredPrice.toString()
                 }
             }
         }

@@ -23,14 +23,12 @@ class CreateOrderViewModel @Inject constructor(
     private val loadedResponsible: MutableList<ResponsibleData> = mutableListOf()
 
     private lateinit var currentDraft: OrderEntity
-    private var saveJob : Job? = null
-
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
             is AppUIEvent.OnBackClicked -> handleBackClicked()
 
-            is CreateOrderUIEvent.OnScreenLoaded -> handleScreenLoaded(event.draftId)
+            is CreateOrderUIEvent.OnScreenLoaded -> handleScreenLoaded(event.draftId, event.editedGod)
             is CreateOrderUIEvent.OnAddGods -> handleAddGods()
             is CreateOrderUIEvent.OnCustomerNameChange -> handleCustomerNameChange(event.name)
             is CreateOrderUIEvent.OnDismissCustomerDropDown -> handleDismissCustomerDropDown()
@@ -125,12 +123,27 @@ class CreateOrderViewModel @Inject constructor(
         }
     }
 
-    private fun handleScreenLoaded(draftId: Long) = launch {
+    private fun handleScreenLoaded(draftId: Long, editedGod: GodOrderTemplate?) = launch {
         reduce { requestInProgress = true }
-
-        saveJob?.join()
-
         currentDraft = repository.getDraft(draftId)
+
+        editedGod?.let {
+            currentDraft.gods = buildList {
+                currentDraft.gods?.forEach {existed ->
+                    if (existed.godEntity.data.refKey == editedGod.godEntity.data.refKey) {
+                        add(editedGod)
+                    } else {
+                        add(existed)
+                    }
+                }
+            }
+
+            repository.saveOrder(currentDraft)
+
+            reduce {
+                orderTemplates = currentDraft.gods
+            }
+        }
 
         if (loadedCustomers.isEmpty()) {
             repository.getCustomers().onSuccess {

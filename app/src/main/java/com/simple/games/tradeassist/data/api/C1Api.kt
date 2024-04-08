@@ -34,7 +34,7 @@ interface C1Api {
     @GET("Catalog_КлассификаторЕдиницИзмерения?\$format=json")
     suspend fun fetchMeasure(@Header("Authorization") auth: String?): Response<DataResponse<MeasureData>>
 
-    @GET("Catalog_Пользователи?\$format=json")
+    @GET("Catalog_Сотрудники?\$format=json")
     suspend fun fetchResponsible(@Header("Authorization") auth: String?): Response<DataResponse<ResponsibleData>>
 
     @GET("InformationRegister_ЦеныНоменклатуры?\$format=json")

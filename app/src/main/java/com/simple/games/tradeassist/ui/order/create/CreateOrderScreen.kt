@@ -2,9 +2,12 @@
 
 package com.simple.games.tradeassist.ui.order.create
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +19,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.Expand
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -34,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -52,6 +59,7 @@ import com.simple.games.tradeassist.domain.GodEntity
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
+import com.simple.games.tradeassist.ui.gods.list.GodsSelectionUIEvent
 import kotlin.math.exp
 
 @Composable
@@ -66,6 +74,18 @@ fun CreateOrderScreen(
                 navigationIcon = R.drawable.ic_arrow_back,
                 onNavigationClick = {
                     onUIEvent(AppUIEvent.OnBackClicked)
+                }, menus = {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clickable { onUIEvent(CreateOrderUIEvent.SaveOrder) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = rememberVectorPainter(image = Icons.Outlined.Done),
+                            contentDescription = null
+                        )
+                    }
                 })
         }
     ) {
@@ -263,28 +283,11 @@ fun CreateOrderScreenContent(
                 }
 
                 item {
-                    Column {
-                        Button(
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = addGodsEnabled,
-                            onClick = { onAddGods() }) {
-                            Text(text = stringResource(id = R.string.add_god))
-                        }
-
-                        Button(
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = addGodsEnabled,
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                            onClick = { onSaveOrder() }) {
-                            if (addGodsEnabled) {
-                                Text(
-                                    color = MaterialTheme.colorScheme.onErrorContainer,
-                                    text = stringResource(R.string.save_order)
-                                )
-                            } else {
-                                Text(text = stringResource(R.string.save_order))
-                            }
-                        }
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = addGodsEnabled,
+                        onClick = { onAddGods() }) {
+                        Text(text = stringResource(id = R.string.add_god))
                     }
                 }
             }

@@ -27,6 +27,7 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Expand
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -84,17 +85,6 @@ fun GodsSelectionScreen(
                             contentDescription = null
                         )
                     }
-                    val size = state.orderTemplates?.size
-                    if (size != null && size > 0) {
-                        Box(
-                            modifier = Modifier
-                                .height(48.dp)
-                                .clickable { onUIEvent(GodsSelectionUIEvent.OnDoneClick) },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "Добавить($size)")
-                        }
-                    }
                 })
         }
     ) {
@@ -107,7 +97,8 @@ fun GodsSelectionScreen(
             showAll = state.showAll,
             onQueryChanged = { onUIEvent(GodsSelectionUIEvent.OnFilterQueryChanged(it)) },
             onGodsClicked = { onUIEvent(GodsSelectionUIEvent.OnGodsClicked(it)) },
-            onShowAllChanged = { onUIEvent(GodsSelectionUIEvent.OnShowAllToggleChanged(it)) }
+            onShowAllChanged = { onUIEvent(GodsSelectionUIEvent.OnShowAllToggleChanged(it)) },
+            onAddClicked = { onUIEvent(GodsSelectionUIEvent.OnDoneClick) }
         )
         HorizontalDivider(modifier = Modifier.padding(it), thickness = 0.5.dp)
     }
@@ -124,6 +115,7 @@ fun GodsSelectionScreenContent(
     onQueryChanged: (String) -> Unit,
     onGodsClicked: (TreeNode) -> Unit,
     onShowAllChanged: (Boolean) -> Unit,
+    onAddClicked: () -> Unit,
 ) {
     var refreshTrigger by remember { mutableIntStateOf(0) }
     val scrollState = rememberLazyListState()
@@ -160,20 +152,36 @@ fun GodsSelectionScreenContent(
                     })
             }
             HorizontalDivider(thickness = 0.5.dp)
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScrollbar(scrollState),
-                state = scrollState
-            ) {
-                for (t in godsList) {
-                    TreeBranch(t, orders = ordersList) {
-                        if (it.content.data.isFolder) {
-                            it.expanded = !it.expanded
-                            refreshTrigger = refreshTrigger.inc()
-                        } else {
-                            onGodsClicked(it)
+            Box(contentAlignment = Alignment.BottomCenter) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScrollbar(scrollState),
+                    state = scrollState
+                ) {
+                    for (t in godsList) {
+                        TreeBranch(t, orders = ordersList) {
+                            if (it.content.data.isFolder) {
+                                it.expanded = !it.expanded
+                                refreshTrigger = refreshTrigger.inc()
+                            } else {
+                                onGodsClicked(it)
+                            }
                         }
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.size(64.dp))
+                    }
+                }
+
+                val size = ordersList?.size ?: 0
+                if (size > 0) {
+                    Button(modifier = Modifier.padding(bottom = 12.dp),
+                        onClick = {
+                            onAddClicked()
+                        }) {
+                        Text(text = "Добавить в заказ ($size)")
                     }
                 }
             }
@@ -306,6 +314,7 @@ fun PreviewGodSelectionScreen() {
                 godsList = listOf(
                     TreeNode(
                         GodEntity(GodsData().apply {
+                            refKey = "asdsad"
                             description = "Папка 1"
                             isFolder = true
                         }), expanded = true, children = mutableListOf(
@@ -325,10 +334,13 @@ fun PreviewGodSelectionScreen() {
                                     })
                                 )
                             ), TreeNode(GodEntity(GodsData().apply {
+                                refKey = "123"
                                 description = "Файл 2"
                             })), TreeNode(GodEntity(GodsData().apply {
+                                refKey = "1233"
                                 description = "Файл 3"
                             })), TreeNode(GodEntity(GodsData().apply {
+                                refKey = "1233"
                                 description = "Файл 4"
                             }))
                         )
@@ -336,7 +348,8 @@ fun PreviewGodSelectionScreen() {
                 ),
 
                 orderTemplates = listOf(
-                    GodOrderTemplate(GodEntity(
+                    GodOrderTemplate(
+                        GodEntity(
                             GodsData().apply {
                                 refKey = "123213"
                                 description =

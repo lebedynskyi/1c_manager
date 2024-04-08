@@ -6,12 +6,10 @@ import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 
 sealed class CreateOrderUIEvent : AppUIEvent() {
-    data class  OnScreenLoaded(val draftId: Long): CreateOrderUIEvent()
-    object OnAddGods: CreateOrderUIEvent()
-    object SaveOrder: CreateOrderUIEvent()
-    object OnDismissCustomerDropDown: CreateOrderUIEvent()
-    data class OnGodsAdded(val gods: List<GodOrderTemplate>): CreateOrderUIEvent()
-    data class OnGodEdited(val god: GodOrderTemplate): CreateOrderUIEvent()
+    data class OnScreenLoaded(val draftId: Long, val editedGod: GodOrderTemplate?): CreateOrderUIEvent()
+    data object OnAddGods: CreateOrderUIEvent()
+    data object SaveOrder: CreateOrderUIEvent()
+    data object OnDismissCustomerDropDown: CreateOrderUIEvent()
     data class OnCustomerNameChange(val name: String): CreateOrderUIEvent()
     data class OnCustomerSelected(val customer: CustomerData): CreateOrderUIEvent()
     data class OnResponsibleSelected(val responsible: ResponsibleData): CreateOrderUIEvent()
