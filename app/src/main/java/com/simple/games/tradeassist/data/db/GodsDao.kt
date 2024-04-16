@@ -18,6 +18,9 @@ interface GodsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(customers: List<GodsData>)
 
+    @Query("DELETE FROM gods")
+    suspend fun deleteAll()
+
     @Delete
     suspend fun delete(customers: GodsData)
 

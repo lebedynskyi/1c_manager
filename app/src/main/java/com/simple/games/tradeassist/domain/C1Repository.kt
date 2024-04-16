@@ -50,17 +50,35 @@ fun initialize() : Boolean {
 
     suspend fun syncData(): Result<Boolean> {
         return fetchCustomers().onSuccess {
-            dataBase.customersDao().insertAll(it)
+            dataBase.withTransaction {
+                dataBase.customersDao().deleteAll()
+                dataBase.customersDao().insertAll(it)
+            }
         }.chain { fetchResponsible() }.onSuccess {
-            dataBase.responsibleDao().insertAll(it)
+            dataBase.withTransaction {
+                dataBase.responsibleDao().deleteAll()
+                dataBase.responsibleDao().insertAll(it)
+            }
         }.chain { fetchMeasure() }.onSuccess {
-            dataBase.measureDao().insertAll(it)
+            dataBase.withTransaction {
+                dataBase.measureDao().deleteAll()
+                dataBase.measureDao().insertAll(it)
+            }
         }.chain { fetchStorage() }.onSuccess {
-            dataBase.storageDao().insertAll(it)
+            dataBase.withTransaction {
+                dataBase.storageDao().deleteAll()
+                dataBase.storageDao().insertAll(it)
+            }
         }.chain { fetchGods() }.onSuccess {
-            dataBase.godsDao().insertAll(it)
+            dataBase.withTransaction {
+                dataBase.godsDao().deleteAll()
+                dataBase.godsDao().insertAll(it)
+            }
         }.chain { fetchPrices() }.onSuccess {
-            dataBase.priceDao().insertAll(it)
+            dataBase.withTransaction {
+                dataBase.priceDao().deleteAll()
+                dataBase.priceDao().insertAll(it)
+            }
         }.map {
             true
         }

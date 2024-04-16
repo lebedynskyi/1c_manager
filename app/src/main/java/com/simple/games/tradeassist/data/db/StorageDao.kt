@@ -15,6 +15,9 @@ interface StorageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(customers: List<StorageRecordData>)
 
+    @Query("DELETE FROM storage")
+    suspend fun deleteAll()
+
     @Delete
     suspend fun delete(customers: StorageRecordData)
 

@@ -60,6 +60,10 @@ class Navigator @Inject constructor() {
         controller?.putArgument(AppRoute.CreateOrder.argDraftId, localId)
         controller?.navigate(AppRoute.CreateOrder.route)
     }
+
+    fun toLoans(){
+        controller?.navigate(AppRoute.LoansRoute.route)
+    }
 }
 
 fun <T> NavHostController.putResult(key: String, value: T) {

@@ -6,4 +6,6 @@ sealed class MainUIEvent : AppUIEvent() {
     data object OnScreenLoaded : MainUIEvent()
     data object OnOrderClick : MainUIEvent()
     data object OnGodsClick : MainUIEvent()
+    data object OnSyncClicked : MainUIEvent()
+    data object OnLoansClicked : MainUIEvent()
 }

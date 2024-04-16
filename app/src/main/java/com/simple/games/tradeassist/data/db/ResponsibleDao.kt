@@ -15,6 +15,9 @@ interface ResponsibleDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(customers: List<ResponsibleData>)
 
+    @Query("DELETE FROM responsible")
+    suspend fun deleteAll()
+
     @Delete
     suspend fun delete(customers: ResponsibleData)
 

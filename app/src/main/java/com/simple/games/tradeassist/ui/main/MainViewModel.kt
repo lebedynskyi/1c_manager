@@ -19,12 +19,18 @@ class MainViewModel @Inject constructor(
             MainUIEvent.OnScreenLoaded -> handleScreenLoaded()
             MainUIEvent.OnOrderClick -> handleOrdersClick()
             MainUIEvent.OnGodsClick -> handleOnGodsClick()
+            MainUIEvent.OnSyncClicked -> handleSyncClicked()
+            MainUIEvent.OnLoansClicked -> handleLoansClicked()
         }
         super.onUIEvent(event)
     }
+    
+    private fun handleLoansClicked() = launch {
+        navigate { toLoans() }
+    }
 
     private fun handleScreenLoaded() = launch {
-        if (!repository.hasData()){
+        if (!repository.hasData()) {
             reduce { requestInProgress = true }
             repository.syncData()
             reduce {
@@ -33,6 +39,12 @@ class MainViewModel @Inject constructor(
         } else {
             repository.syncStorage()
         }
+    }
+
+    private fun handleSyncClicked() = launch {
+        reduce { requestInProgress = true }
+        repository.syncData()
+        reduce { requestInProgress = false }
     }
 
     private fun handleOrdersClick() = launch {

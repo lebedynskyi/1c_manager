@@ -26,6 +26,7 @@ class GodsSelectionViewModel @Inject constructor(
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
             is AppUIEvent.OnBackClicked -> handleBackClicked()
+            is GodsSelectionUIEvent.OnFilterQueryChanged -> handleSearchQuery(event.query)
             is GodsSelectionUIEvent.OnScreenLoaded -> handleScreenLoaded(event.orderId)
             is GodsSelectionUIEvent.OnDoneClick -> handleDoneClicked()
             is GodsSelectionUIEvent.OnCollapseClick -> handleCollapseClicked()
@@ -43,6 +44,26 @@ class GodsSelectionViewModel @Inject constructor(
         reduce {
             godsList = if (isFullMode) fullTree else filteredTree
             showAll = isFullMode
+        }
+    }
+
+    private fun handleSearchQuery(query: String) {
+        val searched = fullTree.map { deepSearch(query, it) }.flatten()
+            .sortedByDescending { it.content.data.description }
+
+        reduce {
+            filteredContent = searched
+            filterQuery = query
+        }
+    }
+
+    private fun deepSearch(query: String, node: TreeNode): List<TreeNode> {
+        return buildList {
+            if (node.content.data.isFolder) {
+                addAll(node.children.map { deepSearch(query, it) }.flatten())
+            } else if (node.content.data.description?.contains(query, true) == true) {
+                add(node)
+            }
         }
     }
 
@@ -88,24 +109,33 @@ class GodsSelectionViewModel @Inject constructor(
     }
 
     private fun handleGodOrderAdded(orderTemplate: GodOrderTemplate) = launch {
-       currentOrder?.let {
-           it.gods = buildList {
-               addAll(it.gods.orEmpty().filter { it.godEntity.data.refKey != orderTemplate.godEntity.data.refKey })
-               add(orderTemplate)
-           }
+        currentOrder?.let {
+            it.gods = buildList {
+                addAll(
+                    it.gods.orEmpty()
+                        .filter { it.godEntity.data.refKey != orderTemplate.godEntity.data.refKey })
+                add(orderTemplate)
+            }
 
-           repository.saveOrder(it)
+            repository.saveOrder(it)
 
-           reduce {
-               orderTemplates = it.gods
-           }
-       }
+            reduce {
+                orderTemplates = it.gods
+            }
+        }
     }
 
     private fun handleGodsClicked(node: TreeNode) = launch {
         navigate {
-            val addedGod = currentOrder?.gods?.firstOrNull { it.godEntity.data.refKey == node.content.data.refKey }
-            toGodsInfo(node.content, currentOrder?.customerName, currentOrder?.customerKey, addedGod?.amount, addedGod?.price)
+            val addedGod =
+                currentOrder?.gods?.firstOrNull { it.godEntity.data.refKey == node.content.data.refKey }
+            toGodsInfo(
+                node.content,
+                currentOrder?.customerName,
+                currentOrder?.customerKey,
+                addedGod?.amount,
+                addedGod?.price
+            )
         }
     }
 
@@ -145,7 +175,11 @@ class GodsSelectionViewModel @Inject constructor(
             }
         }
 
-        roots.sortWith(compareBy({ !it.content.data.isFolder }, { it.content.data.description?.lowercase() }))
+        roots.sortWith(
+            compareBy(
+                { !it.content.data.isFolder },
+                { it.content.data.description?.lowercase() })
+        )
 
         if (!fullMode) {
             filterWithFiles(roots)
@@ -187,7 +221,8 @@ class GodsSelectionViewModel @Inject constructor(
         root.children.forEach { sortTreeNode(it) }
         return root
     }
-    private fun collapseAll(node: List<TreeNode> ): MutableList<TreeNode>{
+
+    private fun collapseAll(node: List<TreeNode>): MutableList<TreeNode> {
         val nodes = node.map {
             it.copy(expanded = false, children = collapseAll(it.children))
         }.toMutableList()

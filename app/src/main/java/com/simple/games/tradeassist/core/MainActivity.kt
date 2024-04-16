@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -47,7 +49,10 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                Box(modifier = Modifier.imePadding()) {
+                Box(modifier = Modifier
+                    .imePadding()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()) {
                     NavHost(navHostController, startDestination = AppRoute.LoginRoute.route) {
                         applicationListNavGraph(navHostController)
                     }

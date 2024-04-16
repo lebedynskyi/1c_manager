@@ -15,6 +15,9 @@ import com.simple.games.tradeassist.ui.gods.info.GodInfoViewModel
 import com.simple.games.tradeassist.ui.gods.list.GodsSelectionScreen
 import com.simple.games.tradeassist.ui.gods.list.GodsSelectionUIEvent
 import com.simple.games.tradeassist.ui.gods.list.GodsSelectionViewModel
+import com.simple.games.tradeassist.ui.loans.LoansScreen
+import com.simple.games.tradeassist.ui.loans.LoansUIEvent
+import com.simple.games.tradeassist.ui.loans.LoansViewModel
 import com.simple.games.tradeassist.ui.login.LoginScreen
 import com.simple.games.tradeassist.ui.login.LoginUIEvent
 import com.simple.games.tradeassist.ui.login.LoginViewModel
@@ -108,5 +111,17 @@ fun NavGraphBuilder.applicationListNavGraph(
         }
 
         GodInfoScreen(state, onUIEvent = viewModel::onUIEvent)
+    }
+
+
+    composable(AppRoute.LoansRoute.route) {
+        val viewModel = hiltViewModel<LoansViewModel>()
+        val state by viewModel.viewState.collectAsState()
+
+        LaunchedEffect(key1 = Unit) {
+            viewModel.onUIEvent(LoansUIEvent.OnScreenLoaded)
+        }
+
+        LoansScreen(state, onUIEvent = viewModel::onUIEvent)
     }
 }

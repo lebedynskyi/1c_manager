@@ -1,8 +1,7 @@
-статус заказа и отгруженно со склада.
-
-gods list - search with folder path
+Calculator
+Дебет - кредит
 
 Error handling
 repeat network call
 
-Calculator
+статус заказа и отгруженно со склада

@@ -1,7 +1,11 @@
-@file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
+@file:OptIn(
+    ExperimentalFoundationApi::class, ExperimentalFoundationApi::class,
+    ExperimentalMaterial3Api::class
+)
 
 package com.simple.games.tradeassist.ui.gods.list
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -28,15 +32,18 @@ import androidx.compose.material.icons.outlined.Expand
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -65,13 +72,19 @@ fun GodsSelectionScreen(
     state: GodsSelectionViewState,
     onUIEvent: (AppUIEvent) -> Unit = {}
 ) {
+    var searchActive by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             AppTopBar(
                 title = R.string.gods_title,
                 navigationIcon = R.drawable.ic_arrow_back,
                 onNavigationClick = {
-                    onUIEvent(AppUIEvent.OnBackClicked)
+                    if (searchActive) {
+                        searchActive = false
+                    } else {
+                        onUIEvent(AppUIEvent.OnBackClicked)
+                    }
                 },
                 menus = {
                     Box(
@@ -88,18 +101,39 @@ fun GodsSelectionScreen(
                 })
         }
     ) {
-        GodsSelectionScreenContent(
-            state.contentInProgress,
-            filterQuery = state.filterQuery,
-            godsList = state.godsList,
-            ordersList = state.orderTemplates,
-            modifier = Modifier.padding(it),
-            showAll = state.showAll,
-            onQueryChanged = { onUIEvent(GodsSelectionUIEvent.OnFilterQueryChanged(it)) },
-            onGodsClicked = { onUIEvent(GodsSelectionUIEvent.OnGodsClicked(it)) },
-            onShowAllChanged = { onUIEvent(GodsSelectionUIEvent.OnShowAllToggleChanged(it)) },
-            onAddClicked = { onUIEvent(GodsSelectionUIEvent.OnDoneClick) }
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            SearchBar(
+                modifier = Modifier.padding(it),
+                query = state.filterQuery,
+                placeholder = { Text(text = "Поиск товаров") },
+                onQueryChange = { onUIEvent(GodsSelectionUIEvent.OnFilterQueryChanged(it)) },
+                onSearch = { },
+                active = searchActive,
+                onActiveChange = { searchActive = it }
+            ) {
+                LazyColumn {
+                    state.filteredContent?.forEach { node ->
+                        item {
+                            val existedOrder =
+                                state.orderTemplates?.firstOrNull { it.godEntity.data.refKey == node.content.data.refKey }
+                            TreeLeafComposable(node, existedOrder, 0) {
+                                onUIEvent(GodsSelectionUIEvent.OnGodsClicked(it))
+                            }
+                        }
+                    }
+                }
+            }
+
+            GodsSelectionScreenContent(
+                state.contentInProgress,
+                godsList = state.godsList,
+                ordersList = state.orderTemplates,
+                showAll = state.showAll,
+                onGodsClicked = { onUIEvent(GodsSelectionUIEvent.OnGodsClicked(it)) },
+                onShowAllChanged = { onUIEvent(GodsSelectionUIEvent.OnShowAllToggleChanged(it)) },
+                onAddClicked = { onUIEvent(GodsSelectionUIEvent.OnDoneClick) }
+            )
+        }
         HorizontalDivider(modifier = Modifier.padding(it), thickness = 0.5.dp)
     }
 }
@@ -109,10 +143,8 @@ fun GodsSelectionScreenContent(
     contentInProgress: Boolean,
     godsList: List<TreeNode>,
     ordersList: List<GodOrderTemplate>?,
-    filterQuery: String,
     modifier: Modifier = Modifier,
     showAll: Boolean = false,
-    onQueryChanged: (String) -> Unit,
     onGodsClicked: (TreeNode) -> Unit,
     onShowAllChanged: (Boolean) -> Unit,
     onAddClicked: () -> Unit,
@@ -125,16 +157,13 @@ fun GodsSelectionScreenContent(
         isContentInProgress = contentInProgress,
         modifier = modifier
     ) {
-        Column(Modifier.fillMaxSize()) {
-            OutlinedTextField(
-                placeholder = {
-                    Text(text = stringResource(id = R.string.filter))
-                },
-                modifier = Modifier
-                    .padding(12.dp)
-                    .fillMaxWidth(),
-                value = filterQuery, onValueChange = onQueryChanged
-            )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+            Spacer(Modifier.size(12.dp))
+
             HorizontalDivider(thickness = 0.5.dp)
 
             Row(
@@ -205,103 +234,113 @@ fun LazyListScope.TreeBranch(
     }
 }
 
+@Composable
+fun TreeLeafComposable(
+    node: TreeNode,
+    order: GodOrderTemplate?,
+    shift: Int = 0,
+    onItemClick: (TreeNode) -> Unit,
+) {
+    val shiftSize = 10 * shift
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onItemClick(node) },
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.heightIn(64.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (shift > 0) {
+                    Spacer(modifier = Modifier.size((shiftSize).dp))
+                }
+                if (node.content.data.isFolder) {
+                    if (node.expanded) {
+                        Image(
+                            modifier = Modifier.size(20.dp),
+                            painter = rememberVectorPainter(image = Icons.Outlined.KeyboardArrowDown),
+                            contentDescription = null,
+                        )
+                    } else {
+                        Image(
+                            modifier = Modifier.size(20.dp),
+                            painter = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.KeyboardArrowRight),
+                            contentDescription = null,
+                        )
+                    }
+
+                    Image(
+                        modifier = Modifier.size(20.dp),
+                        painter = rememberVectorPainter(image = Icons.Outlined.Folder),
+                        contentDescription = null,
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                        text = node.content.data.description.orEmpty()
+                    )
+                } else {
+                    Spacer(
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Image(
+                        modifier = Modifier.size(20.dp),
+                        painter = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.InsertDriveFile),
+                        contentDescription = null,
+                    )
+
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        maxLines = 2,
+                        modifier = Modifier.weight(1f),
+                        text = node.content.data.description.orEmpty()
+                    )
+                    if (order != null) {
+                        Column {
+                            Text(text = "${order.amount} ${order.godEntity.measureData?.name ?: ""}")
+                            Text(text = "${order.price} грн")
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.size(8.dp))
+                }
+            }
+
+            if (!node.content.data.isFolder) {
+                Text(
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = (24 + shiftSize).dp),
+                    text = "На складе ${node.content.availableAmount} ${node.content.measureData?.name}"
+                )
+            }
+
+            node.content.price.forEach {
+                Text(
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = (24 + shiftSize).dp),
+                    text = "${it.priceTypeName}: ${it.priceValue} грн"
+                )
+            }
+        }
+
+        HorizontalDivider(thickness = 0.5.dp)
+    }
+}
+
 fun LazyListScope.TreeLeaf(
     node: TreeNode,
     order: GodOrderTemplate?,
     shift: Int,
     onItemClick: (TreeNode) -> Unit,
 ) {
-    val shiftSize = 10 * shift
     item {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onItemClick(node) },
-        ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.heightIn(64.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (shift > 0) {
-                        Spacer(modifier = Modifier.size((shiftSize).dp))
-                    }
-                    if (node.content.data.isFolder) {
-                        if (node.expanded) {
-                            Image(
-                                modifier = Modifier.size(20.dp),
-                                painter = rememberVectorPainter(image = Icons.Outlined.KeyboardArrowDown),
-                                contentDescription = null,
-                            )
-                        } else {
-                            Image(
-                                modifier = Modifier.size(20.dp),
-                                painter = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.KeyboardArrowRight),
-                                contentDescription = null,
-                            )
-                        }
-
-                        Image(
-                            modifier = Modifier.size(20.dp),
-                            painter = rememberVectorPainter(image = Icons.Outlined.Folder),
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-                        Text(
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f),
-                            text = node.content.data.description.orEmpty()
-                        )
-                    } else {
-                        Spacer(
-                            modifier = Modifier.size(20.dp),
-                        )
-                        Image(
-                            modifier = Modifier.size(20.dp),
-                            painter = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.InsertDriveFile),
-                            contentDescription = null,
-                        )
-
-                        Spacer(modifier = Modifier.size(8.dp))
-                        Text(
-                            maxLines = 2,
-                            modifier = Modifier.weight(1f),
-                            text = node.content.data.description.orEmpty()
-                        )
-                        if (order != null) {
-                            Column {
-                                Text(text = "${order.amount} ${order.godEntity.measureData?.name ?: ""}")
-                                Text(text = "${order.price} грн")
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.size(8.dp))
-                    }
-                }
-
-                if (!node.content.data.isFolder) {
-                    Text(
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(start = (24 + shiftSize).dp),
-                        text = "На складе ${node.content.availableAmount} ${node.content.measureData?.name}"
-                    )
-                }
-
-                node.content.price.forEach {
-                    Text(
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(start = (24 + shiftSize).dp),
-                        text = "${it.priceTypeName}: ${it.priceValue} грн"
-                    )
-                }
-            }
-
-            HorizontalDivider(thickness = 0.5.dp)
-        }
+        TreeLeafComposable(node = node, order = order, shift = shift, onItemClick = onItemClick)
     }
 }
 

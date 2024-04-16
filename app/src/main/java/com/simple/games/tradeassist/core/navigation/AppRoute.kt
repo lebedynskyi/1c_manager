@@ -13,11 +13,14 @@ sealed class AppRoute {
         val route = "Orders"
     }
 
+    object LoansRoute {
+        val route = "Loans"
+    }
+
     object GodsSelectionRoute {
         val route = "GodsSelection"
         val resultSelectedGods = "GodsSelectionResultGodKey"
         val argOrderId = "GodsSelectionArgOrderId"
-
     }
 
     object GodsInfoRoute {

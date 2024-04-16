@@ -18,6 +18,9 @@ interface PriceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(customers: List<PriceData>)
 
+    @Query("DELETE FROM price")
+    suspend fun deleteAll()
+
     @Delete
     suspend fun delete(customers: PriceData)
 

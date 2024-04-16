@@ -25,4 +25,6 @@
     <string name="delete_order_template">Удалить товар</string>
     <string name="edit_order_template">Редактировать</string>
     <string name="save_order">Сохранить заказ</string>
+    <string name="full_sync">Синхронизировать</string>
+    <string name="loans">Долги</string>
 </resources>
