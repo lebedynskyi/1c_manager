@@ -10,9 +10,7 @@ data class GodInfoViewState(
     var orderHistory: List<Pair<String, GodOrderData>>? = null,
     var historyName: String? = null,
     var addBtnEnabled: Boolean = false,
-    var amountInput: String? = null,
-    var amountError: Boolean = false,
-    var priceMarga: Double = 0.0,
-    var priceInput: String? = null,
-    var priceError: Boolean = false
+    var amount: Float? = null,
+    var price: Float? = null,
+    var marga: Float? = null
 ) : AppViewState()

@@ -12,6 +12,6 @@ sealed class GodInfoUIEvent : AppUIEvent() {
         val price: Float? = null,
         val amount: Float? = null
     ) : GodInfoUIEvent()
-    data class OnAmountChanged(val amount: String) : GodInfoUIEvent()
-    data class OnPriceChanged(val price: String) : GodInfoUIEvent()
+    data class OnAmountChanged(val amount: Float) : GodInfoUIEvent()
+    data class OnPriceChanged(val price: Float) : GodInfoUIEvent()
 }

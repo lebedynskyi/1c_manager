@@ -184,18 +184,16 @@ private fun OrderItem(
                 )
             }
             HorizontalDivider(thickness = 0.5.dp)
-            if (order.refKey.isNullOrBlank()) {
-                Column {
-                    order.gods.orEmpty().forEach {
-                        Text(
-                            text = "${it.godEntity.data.description}",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(text = "Кол.: ${it.amount} ${it.godEntity.measureData?.name}")
-                        Text(text = "Цена: ${it.price} грн")
-                        Text(text = "Сумма: ${it.sum} грн")
-                        HorizontalDivider(thickness = 0.5.dp)
-                    }
+            Column {
+                order.gods.orEmpty().forEach {
+                    Text(
+                        text = "${it.godEntity.data.description}",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(text = "Кол.: ${it.amount} ${it.godEntity.measureData?.name}")
+                    Text(text = "Цена: ${it.price} грн")
+                    Text(text = "Сумма: ${it.sum} грн")
+                    HorizontalDivider(thickness = 0.5.dp)
                 }
             }
 
@@ -231,7 +229,8 @@ private fun OrderItem(
                     }
                 }
 
-                Button(modifier = Modifier.fillMaxWidth(), onClick = { onPublishClick(order) }) {
+                Button(modifier = Modifier.fillMaxWidth(),
+                    onClick = { onPublishClick(order) }) {
                     Text(text = "Опубликовать")
                 }
             }

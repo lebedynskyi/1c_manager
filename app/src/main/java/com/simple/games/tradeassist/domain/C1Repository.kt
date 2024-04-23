@@ -87,18 +87,17 @@ fun initialize() : Boolean {
     suspend fun syncStorage() {
         fetchStorage().onSuccess {
             dataBase.withTransaction {
-                dataBase.storageDao().purge()
+                dataBase.storageDao().deleteAll()
                 dataBase.storageDao().insertAll(it)
             }
         }
     }
 
-    // TODO calculate price? WTF to do
     suspend fun getGods(): Result<List<GodEntity>> {
-        val measures = dataBase.measureDao().getAll()
         val storage = dataBase.storageDao().getAll().groupBy { it.godKey }
-        val gods = dataBase.godsDao().getAll()
         val prices = dataBase.priceDao().getAll().groupBy { it.godKey }
+        val measures = dataBase.measureDao().getAll()
+        val gods = dataBase.godsDao().getAll()
 
         val result = buildList {
             for (g in gods) {
@@ -142,10 +141,6 @@ fun initialize() : Boolean {
         return Result.success(dataBase.responsibleDao().getAll())
     }
 
-    suspend fun getOrderHistory(customerKey: String): Result<List<OrderHistoryData>> {
-        return apiDataSource.getOrderHistory(customerKey)
-    }
-
     suspend fun getOrderHistory(
         customerKey: String, godKey: String
     ): Result<List<Pair<String, GodOrderData>>> {
@@ -159,6 +154,10 @@ fun initialize() : Boolean {
                 }
             }.reversed()
         }
+    }
+
+    suspend fun getOrderHistory(customerKey: String): Result<List<OrderHistoryData>> {
+        return apiDataSource.getOrderHistory(customerKey)
     }
 
     suspend fun getOrders(isDraft: Boolean): Result<List<OrderEntity>> {

@@ -15,14 +15,11 @@ interface StorageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(customers: List<StorageRecordData>)
 
-    @Query("DELETE FROM storage")
-    suspend fun deleteAll()
-
     @Delete
     suspend fun delete(customers: StorageRecordData)
 
     @Query("DELETE FROM storage")
-    fun purge()
+    fun deleteAll()
 
     @Query("SELECT COUNT(godRefKey) FROM storage")
     suspend fun getCount(): Int

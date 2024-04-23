@@ -1,32 +1,43 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.simple.games.tradeassist.ui.gods.info
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,13 +49,24 @@ import com.simple.games.tradeassist.data.api.response.GodOrderData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.PriceData
 import com.simple.games.tradeassist.domain.GodEntity
+import com.simple.games.tradeassist.ui.KeyBoard
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
+import kotlinx.coroutines.launch
 
 @Composable
 fun GodInfoScreen(
     state: GodInfoViewState, onUIEvent: (AppUIEvent) -> Unit = {}
 ) {
+    val scope = rememberCoroutineScope()
+    var showAmountKeyboard by remember {
+        mutableStateOf(false)
+    }
+
+    var showPriceKeyboard by remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(topBar = {
         AppTopBar(title = R.string.god_info,
             navigationIcon = R.drawable.ic_arrow_back,
@@ -68,34 +90,69 @@ fun GodInfoScreen(
             })
     }) {
         GodInfoScreenContent(
-            state.amountInput.orEmpty(),
-            state.priceInput.orEmpty(),
-            state.priceMarga,
+            state.amount,
+            state.price,
+            state.marga,
             state.addBtnEnabled,
             state.godsEntity,
             state.orderHistory,
             state.historyName,
             modifier = Modifier.padding(it),
-            onAmountChanged = { onUIEvent(GodInfoUIEvent.OnAmountChanged(it)) },
-            onPriceChanged = { onUIEvent(GodInfoUIEvent.OnPriceChanged(it)) },
+            onAmountPressed = { showAmountKeyboard = true },
+            onPricePressed = { showPriceKeyboard = true },
             onAddClicked = { onUIEvent(GodInfoUIEvent.OnAddClick) })
     }
 
     ContentLoadingIndicator(show = state.requestInProgress)
+
+    val amountSheet = rememberModalBottomSheetState()
+    if (showAmountKeyboard) {
+        ModalBottomSheet(
+            sheetState = amountSheet,
+            onDismissRequest = {
+            showAmountKeyboard = false
+        }) {
+            KeyBoard(
+                "Колличесство",
+                value = state.amount
+            ) {
+                scope.launch {
+                    amountSheet.hide()
+                    showAmountKeyboard = false
+                }
+                onUIEvent(GodInfoUIEvent.OnAmountChanged(it))
+            }
+        }
+    }
+
+    val priceSheet = rememberModalBottomSheetState()
+    if (showPriceKeyboard) {
+        ModalBottomSheet(onDismissRequest = {
+            showPriceKeyboard = false
+        }) {
+            KeyBoard("Цена", value = state.price) {
+                scope.launch {
+                    priceSheet.hide()
+                    showPriceKeyboard = false
+                }
+                onUIEvent(GodInfoUIEvent.OnPriceChanged(it))
+            }
+        }
+    }
 }
 
 @Composable
 fun GodInfoScreenContent(
-    amount: String,
-    price: String,
-    marga: Double,
+    amount: Float?,
+    price: Float?,
+    marga: Float?,
     addBtnEnabled: Boolean,
     godEntity: GodEntity?,
     orderHistory: List<Pair<String, GodOrderData>>?,
     historyName: String?,
     modifier: Modifier = Modifier,
-    onAmountChanged: (String) -> Unit = {},
-    onPriceChanged: (String) -> Unit = {},
+    onAmountPressed: () -> Unit = {},
+    onPricePressed: () -> Unit = {},
     onAddClicked: () -> Unit = {}
 ) {
     if (godEntity == null) {
@@ -148,7 +205,7 @@ fun GodInfoScreenContent(
                             text = "${it.priceTypeName}: ${it.priceValue} грн"
                         )
 
-                        if (index == godEntity.price.size - 1) {
+                        if (index == godEntity.price.size - 1 && marga != null) {
                             Text(text = "Р=$marga%")
                         }
                     }
@@ -161,14 +218,25 @@ fun GodInfoScreenContent(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(text = "Колличесство:", modifier = Modifier.weight(3F))
-                OutlinedTextField(modifier = Modifier.weight(1f),
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    value = amount,
-                    onValueChange = {
-                        onAmountChanged(it)
-                    })
-
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .defaultMinSize(72.dp)
+                        .clickable {
+                            onAmountPressed()
+                        }
+                        .border(
+                            width = 0.5.dp,
+                            color = MaterialTheme.colorScheme.surfaceTint,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                ) {
+                    Text(
+                        modifier = Modifier.padding(12.dp),
+                        text = amount?.toString() ?: "",
+                        maxLines = 1
+                    )
+                }
             }
 
             HorizontalDivider(thickness = 0.5.dp)
@@ -177,17 +245,29 @@ fun GodInfoScreenContent(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(text = "Цена покупки: ", modifier = Modifier.weight(3F))
-                OutlinedTextField(keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f),
-                    value = price,
-                    onValueChange = {
-                        onPriceChanged(it)
-                    })
-
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .defaultMinSize(72.dp)
+                        .clickable {
+                            onPricePressed()
+                        }
+                        .border(
+                            width = 0.5.dp,
+                            color = MaterialTheme.colorScheme.surfaceTint,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                ) {
+                    Text(
+                        modifier = Modifier.padding(12.dp),
+                        text = price?.toString() ?: "",
+                        maxLines = 1
+                    )
+                }
             }
 
             HorizontalDivider(thickness = 0.5.dp)
-            Text(text = "История $historyName:")
+            Text(text = "История покупок для $historyName:")
 
             for ((date, god) in orderHistory.orEmpty()) {
                 Row {
@@ -215,7 +295,8 @@ fun GodInfoScreenPreview() {
     TradeAssistTheme {
         GodInfoScreen(
             state = GodInfoViewState(
-                priceInput = "12.4",
+                price = 12.4F,
+                amount = 123.3F,
                 godsEntity = GodEntity(
                     GodsData().apply {
                         description =

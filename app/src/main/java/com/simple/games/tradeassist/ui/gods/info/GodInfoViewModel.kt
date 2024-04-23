@@ -33,8 +33,8 @@ class GodInfoViewModel @Inject constructor(
     }
 
     private fun handleOnAddGods() = launch { state ->
-        val amount = state.amountInput?.toFloatOrNull() ?: return@launch
-        val price = state.priceInput?.toFloatOrNull() ?: return@launch
+        val amount = state.amount ?: return@launch
+        val price = state.price ?: return@launch
         val god = currentGod ?: return@launch
 
         val orderModel = GodOrderTemplate(god, amount, price)
@@ -43,62 +43,34 @@ class GodInfoViewModel @Inject constructor(
         }
     }
 
-    private fun handleAmountChanged(amountInput: String) {
+    private fun handleAmountChanged(amount: Float?) {
         reduce {
-            this.amountInput = amountInput
-        }
-
-        if (amountInput.isBlank()) {
-            reduce {
-                amountError = false
-                addBtnEnabled = false
-            }
-            return
-        }
-
-        if (amountInput.toFloatOrNull() == null) {
-            reduce {
-                amountError = true
-                addBtnEnabled = false
-            }
-        } else {
-            reduce {
-                this.addBtnEnabled = !priceError && priceInput?.isNotBlank() == true
-            }
+            val price = price
+            this.amount = amount
+            this. addBtnEnabled = price != null && price > 0
         }
     }
 
-    private fun handlePriceChanged(priceInput: String) {
+    private fun handlePriceChanged(price: Float?) {
         reduce {
-            this.priceInput = priceInput
+            this.price = price
+        }
+        if (price == null || price <= 0) {
+            reduce {
+                addBtnEnabled = false
+                 this.marga = 0.00F
+            }
         }
 
-        if (priceInput.isBlank()) {
-            reduce {
-                priceError = false
-                addBtnEnabled = false
-                priceMarga = 0.00
-            }
-            return
-        }
+        reduce {
+            val amount = this.amount
+            this.addBtnEnabled = amount != null && amount > 0
 
-        val enteredPrice = priceInput.toFloatOrNull()
-        if (enteredPrice == null) {
-            reduce {
-                priceError = true
-                addBtnEnabled = false
-                priceMarga = 0.00
-            }
-        } else {
-            reduce {
-                this.addBtnEnabled = !amountError && amountInput?.isNotBlank() == true
-
-                val price1 = currentGod?.price?.getOrNull(0)?.priceValue
-                val price2 = currentGod?.price?.getOrNull(1)?.priceValue
-                if (price1 != null && price1 != 0F && price2 !=null && price2 != 0F) {
-                    val min = min(price1, price2)
-                    priceMarga = ((enteredPrice - min) / (min / 100.0)).round(2)
-                }
+            val price1 = currentGod?.price?.getOrNull(0)?.priceValue
+            val price2 = currentGod?.price?.getOrNull(1)?.priceValue
+            if (price1 != null && price1 > 0F && price2 !=null && price2 > 0F && price != null) {
+                val min = min(price1, price2)
+                marga = ((price - min) / (min / 100.0F)).round(2)
             }
         }
     }
@@ -120,7 +92,7 @@ class GodInfoViewModel @Inject constructor(
             reduce {
                 godsEntity = it
                 amount?.let {
-                    this.amountInput = it.toString()
+                    this.amount = it
                 }
 
                 val price1 = god.price.getOrNull(0)?.priceValue
@@ -130,14 +102,14 @@ class GodInfoViewModel @Inject constructor(
                     val min = min(price1, price2)
 
                     if (enteredPrice != null){
-                        this.priceInput = enteredPrice.toString()
-                        priceMarga = ((enteredPrice - min) / (min / 100.0)).round(2)
+                        this.price = enteredPrice
+                        this.marga = ((enteredPrice - min) / (min / 100.0F)).round(2)
                     } else {
-                        this.priceInput = max.toString()
-                        priceMarga = ((max - min) / (min / 100.0)).round(2)
+                        this.price = max
+                        this.marga = ((max - min) / (min / 100.0F)).round(2)
                     }
                 } else if (enteredPrice != null){
-                    priceInput = enteredPrice.toString()
+                    this.price = enteredPrice
                 }
             }
         }

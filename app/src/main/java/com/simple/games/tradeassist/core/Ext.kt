@@ -9,3 +9,9 @@ fun Double.round(decimals: Int): Double {
     repeat(decimals) { multiplier *= 10 }
     return Math.round(this * multiplier) / multiplier
 }
+
+fun Float.round(decimals: Int): Float {
+    var multiplier = 1.0F
+    repeat(decimals) { multiplier *= 10F }
+    return Math.round(this * multiplier) / multiplier
+}

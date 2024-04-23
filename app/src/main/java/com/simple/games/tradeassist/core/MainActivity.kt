@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.simple.games.tradeassist.core.navigation.AppRoute
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
 
         setContent {
@@ -49,10 +51,12 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                Box(modifier = Modifier
-                    .imePadding()
-                    .statusBarsPadding()
-                    .navigationBarsPadding()) {
+                Box(
+                    modifier = Modifier
+                        .imePadding()
+                        .statusBarsPadding()
+                        .navigationBarsPadding()
+                ) {
                     NavHost(navHostController, startDestination = AppRoute.LoginRoute.route) {
                         applicationListNavGraph(navHostController)
                     }
