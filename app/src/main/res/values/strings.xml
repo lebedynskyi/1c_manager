@@ -13,6 +13,7 @@
     <string name="creation_order">Создание заказа</string>
     <string name="edit_order">Редактирование заказ</string>
     <string name="customer">Заказчик</string>
+    <string name="chose_customer">Выбрать заказчика</string>
     <string name="customers">Заказчики</string>
     <string name="gods">Товары:</string>
     <string name="gods_title">Товары</string>

@@ -1,8 +1,9 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.simple.games.tradeassist.ui.order.create
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +33,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -47,6 +51,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.R
 import com.simple.games.tradeassist.core.theme.TradeAssistTheme
@@ -308,12 +313,24 @@ private fun ResponsibleDropDownMenu(
         expanded = expanded,
         onExpandedChange = { expanded = it })
     {
-        Button(modifier = Modifier
-            .fillMaxWidth()
-            .menuAnchor(),
-            enabled = !responsibleList.isNullOrEmpty(),
-            onClick = { expanded = true }) {
-            Text(text = if (responsibleName.isNullOrBlank()) "Назначить ответственного" else "Ответственный: $responsibleName")
+        Box(
+            contentAlignment = Alignment.CenterStart,
+            modifier = Modifier
+                .defaultMinSize(minHeight = OutlinedTextFieldDefaults.MinHeight)
+                .fillMaxWidth()
+                .clickable { expanded = true }
+                .border(
+                    OutlinedTextFieldDefaults.UnfocusedBorderThickness,
+                    MaterialTheme.colorScheme.outline,
+                    shape = OutlinedTextFieldDefaults.shape
+                )
+                .menuAnchor()
+        ) {
+            Text(
+                modifier = Modifier.padding(start = 12.dp),
+                color = if (responsibleName.isNullOrBlank()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+                text = if (responsibleName.isNullOrBlank()) "Назначить ответственного" else "Ответственный: $responsibleName"
+            )
         }
 
         ExposedDropdownMenu(
@@ -377,7 +394,7 @@ private fun CustomersDropDownMenu(
             }, placeholder = {
                 Text(text = stringResource(id = R.string.customer))
             }, label = {
-                Text(text = stringResource(id = R.string.customer))
+                Text(text = stringResource(id = R.string.chose_customer))
             })
 
         ExposedDropdownMenu(
@@ -386,9 +403,7 @@ private fun CustomersDropDownMenu(
                 .fillMaxWidth()
                 .exposedDropdownSize(),
             expanded = suggestingCustomers.isNotEmpty(),
-            onDismissRequest = {
-                System.err.println("DISMISS REQUST")
-            },
+            onDismissRequest = {},
         ) {
             suggestingCustomers.forEachIndexed { index, customer ->
                 DropdownMenuItem(text = {
@@ -429,20 +444,20 @@ fun PreviewCreateOrder() {
                 orderTemplates = buildList {
                     add(
                         GodOrderTemplate(GodEntity(
-                                data = GodsData().apply {
-                                    refKey = "122"
-                                    description = "Кабель 2х234"
-                                },
-                                measureData = MeasureData().apply {
-                                    name = "шт"
-                                }, price = listOf(PriceData().apply {
-                                    this.priceValue = 10.6F
-                                    this.priceTypeName = "Оптовая цена"
-                                }, PriceData().apply {
-                                    this.priceValue = 11.6F
-                                    this.priceTypeName = "Актальная цена"
-                                }), availableAmount = 6F
-                            ),
+                            data = GodsData().apply {
+                                refKey = "122"
+                                description = "Кабель 2х234"
+                            },
+                            measureData = MeasureData().apply {
+                                name = "шт"
+                            }, price = listOf(PriceData().apply {
+                                this.priceValue = 10.6F
+                                this.priceTypeName = "Оптовая цена"
+                            }, PriceData().apply {
+                                this.priceValue = 11.6F
+                                this.priceTypeName = "Актальная цена"
+                            }), availableAmount = 6F
+                        ),
                             amount = 213F, price = 12313F
                         )
                     )
