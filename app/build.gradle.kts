@@ -7,6 +7,9 @@ plugins {
     id(libs.plugins.jetbrains.parcelize.get().pluginId)
 
     kotlin("plugin.serialization") version "1.9.23"
+
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 kapt {
@@ -21,8 +24,8 @@ android {
         applicationId = "com.simple.games.tradeassist"
         minSdk = 26
         targetSdk = 34
-        versionCode = 13
-        versionName = "0.1.3"
+        versionCode = 16
+        versionName = "0.1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -33,10 +36,12 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            applicationIdSuffix  = ""
+        }
+
+        debug {
+            isMinifyEnabled = false
+            applicationIdSuffix  = ".dev"
         }
     }
     compileOptions {
@@ -55,6 +60,22 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("../tools/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+
+        create("release") {
+            storeFile = file("../tools/release.keystore")
+            keyAlias = "trade"
+            keyPassword = "tradeKey"
+            storePassword = "tradeKey"
         }
     }
 }
@@ -77,6 +98,10 @@ dependencies {
     implementation(libs.androidx.material.icons)
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
+
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
 
     // ---- Room
     val room_version = "2.6.1"

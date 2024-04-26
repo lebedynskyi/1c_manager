@@ -18,7 +18,7 @@ interface OrdersDao {
     @Query("SELECT * FROM orders WHERE refKey is NULL AND localId = :localId")
     suspend fun getDraft(localId: Long): OrderEntity
 
-    @Query("SELECT * FROM orders WHERE refKey is not NULL")
+    @Query("SELECT * FROM orders WHERE refKey is not NULL ORDER BY localId DESC")
     suspend fun getPublished(): List<OrderEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

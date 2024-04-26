@@ -1,4 +1,3 @@
-Calculator
 Дебет - кредит
 
 Error handling
