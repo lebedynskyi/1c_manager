@@ -89,7 +89,7 @@ fun KeyBoard(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(56.dp)
-                    .weight(3f)
+                    .weight(2f)
                     .background(MaterialTheme.colorScheme.surfaceDim),
             ) {
                 Text(
@@ -97,6 +97,27 @@ fun KeyBoard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
+            VerticalDivider(thickness = 0.5.dp)
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        rightBuilder.clear()
+                        leftBuilder.clear()
+                        action = null
+                        trigger += 1
+                    }
+                    .size(56.dp)
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.errorContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Clear",
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.padding(0.dp)
+                )
+            }
+
             VerticalDivider(thickness = 0.5.dp)
             Box(
                 modifier = Modifier
@@ -127,6 +148,169 @@ fun KeyBoard(
                 .height(56.dp)
         ) {
 
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        currentBuilder.append("7")
+                        trigger += 1
+                    }
+                    .size(56.dp)
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "7",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(0.dp)
+                )
+            }
+            VerticalDivider(thickness = 0.5.dp)
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        currentBuilder.append("8")
+                        trigger += 1
+                    }
+                    .size(56.dp)
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "8",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(0.dp)
+                )
+            }
+            VerticalDivider(thickness = 0.5.dp)
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        currentBuilder.append("9")
+                        trigger += 1
+                    }
+                    .size(56.dp)
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "9",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(0.dp)
+                )
+            }
+            VerticalDivider(thickness = 0.5.dp)
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        if (leftBuilder.isNotEmpty()) {
+                            action = Action.Divide
+                            currentBuilder = rightBuilder
+                        }
+                    }
+                    .size(56.dp)
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.errorContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "/",
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.padding(0.dp)
+                )
+            }
+        }
+        HorizontalDivider(thickness = 0.5.dp)
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        currentBuilder.append("4")
+                        trigger += 1
+                    }
+                    .size(56.dp)
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "4",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(0.dp)
+                )
+            }
+            VerticalDivider(thickness = 0.5.dp)
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        currentBuilder.append("5")
+                        trigger += 1
+                    }
+                    .size(56.dp)
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "5",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(0.dp)
+                )
+            }
+            VerticalDivider(thickness = 0.5.dp)
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        currentBuilder.append("6")
+                        trigger += 1
+                    }
+                    .size(56.dp)
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "6",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(0.dp)
+                )
+            }
+            VerticalDivider(thickness = 0.5.dp)
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        if (leftBuilder.isNotEmpty()) {
+                            action = Action.Multiply
+                            currentBuilder = rightBuilder
+                        }
+                    }
+                    .size(56.dp)
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.errorContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "*",
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.padding(0.dp)
+                )
+            }
+        }
+        HorizontalDivider(thickness = 0.5.dp)
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+        ) {
             Box(
                 modifier = Modifier
                     .clickable {
@@ -202,167 +386,7 @@ fun KeyBoard(
             }
         }
         HorizontalDivider(thickness = 0.5.dp)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-        ) {
 
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        currentBuilder.append("4")
-                        trigger += 1
-                    }
-                    .size(56.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "4",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(0.dp)
-                )
-            }
-            VerticalDivider(thickness = 0.5.dp)
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        currentBuilder.append("5")
-                        trigger += 1
-                    }
-                    .size(56.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "5",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(0.dp)
-                )
-            }
-            VerticalDivider(thickness = 0.5.dp)
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        currentBuilder.append("6")
-                        trigger += 1
-                    }
-                    .size(56.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "6",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(0.dp)
-                )
-            }
-            VerticalDivider(thickness = 0.5.dp)
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        if (leftBuilder.isNotEmpty()) {
-                        action = Action.Multiply
-                        currentBuilder = rightBuilder
-                        }
-                    }
-                    .size(56.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colorScheme.errorContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "*",
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                    modifier = Modifier.padding(0.dp)
-                )
-            }
-        }
-        HorizontalDivider(thickness = 0.5.dp)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        currentBuilder.append("7")
-                        trigger += 1
-                    }
-                    .size(56.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "7",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(0.dp)
-                )
-            }
-            VerticalDivider(thickness = 0.5.dp)
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        currentBuilder.append("8")
-                        trigger += 1
-                    }
-                    .size(56.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "8",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(0.dp)
-                )
-            }
-            VerticalDivider(thickness = 0.5.dp)
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        currentBuilder.append("9")
-                        trigger += 1
-                    }
-                    .size(56.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "9",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(0.dp)
-                )
-            }
-            VerticalDivider(thickness = 0.5.dp)
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        if (leftBuilder.isNotEmpty()) {
-                        action = Action.Divide
-                        currentBuilder = rightBuilder}
-                    }
-                    .size(56.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colorScheme.errorContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "/",
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                    modifier = Modifier.padding(0.dp)
-                )
-            }
-        }
-        HorizontalDivider(thickness = 0.5.dp)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -417,7 +441,7 @@ fun KeyBoard(
                 modifier = Modifier
                     .clickable {
                         currentBuilder.append(".")
-                        trigger +=1
+                        trigger += 1
                     }
                     .size(56.dp)
                     .weight(1f)
@@ -434,11 +458,19 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        val f1 = leftBuilder.toString().toFloatOrNull() ?: return@clickable
-                        val f2 = rightBuilder.toString().toFloatOrNull()
+                        val f1 = leftBuilder
+                            .toString()
+                            .toFloatOrNull() ?: return@clickable
+                        val f2 = rightBuilder
+                            .toString()
+                            .toFloatOrNull()
                         val act = action
                         if (f2 != null && act != null) {
-                            onEntered(act.operate(f1, f2).round(2))
+                            onEntered(
+                                act
+                                    .operate(f1, f2)
+                                    .round(2)
+                            )
                         } else {
                             onEntered(f1)
                         }
