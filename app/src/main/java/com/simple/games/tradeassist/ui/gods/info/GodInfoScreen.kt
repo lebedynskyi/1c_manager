@@ -109,33 +109,29 @@ fun GodInfoScreen(
     if (showAmountKeyboard) {
         ModalBottomSheet(
             sheetState = amountSheet,
-            onDismissRequest = {
-            showAmountKeyboard = false
-        }) {
-            KeyBoard(
-                "Колличесство",
-                value = state.amount
-            ) {
+            onDismissRequest = { showAmountKeyboard = false }) {
+            KeyBoard("Колличесство", value = state.amount) {
+                onUIEvent(GodInfoUIEvent.OnAmountChanged(it))
                 scope.launch {
                     amountSheet.hide()
                     showAmountKeyboard = false
                 }
-                onUIEvent(GodInfoUIEvent.OnAmountChanged(it))
             }
         }
     }
 
     val priceSheet = rememberModalBottomSheetState()
     if (showPriceKeyboard) {
-        ModalBottomSheet(onDismissRequest = {
-            showPriceKeyboard = false
-        }) {
+        ModalBottomSheet(
+            sheetState = priceSheet,
+            onDismissRequest = { showPriceKeyboard = false }
+        ) {
             KeyBoard("Цена", value = state.price) {
+                onUIEvent(GodInfoUIEvent.OnPriceChanged(it))
                 scope.launch {
                     priceSheet.hide()
                     showPriceKeyboard = false
                 }
-                onUIEvent(GodInfoUIEvent.OnPriceChanged(it))
             }
         }
     }

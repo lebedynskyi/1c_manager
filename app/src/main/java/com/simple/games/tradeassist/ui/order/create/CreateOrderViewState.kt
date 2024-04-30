@@ -8,8 +8,8 @@ import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 data class CreateOrderViewState(
     var customerName: String = "",
     var responsibleName: String? = null,
-    var filteredCustomers: List<CustomerData> = emptyList(),
     var addGodsEnabled: Boolean = false,
+    var filteredCustomers: List<CustomerData> = emptyList(),
     var orderTemplates: List<GodOrderTemplate>? = null,
     var responsible: List<ResponsibleData>? = null
 ) : AppViewState()

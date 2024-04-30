@@ -18,14 +18,14 @@ import androidx.compose.ui.unit.dp
 fun Modifier.verticalScrollbar(
     state: LazyListState,
     width: Dp = 6.dp,
-    color: Color = MaterialTheme.colorScheme.onBackground,
 ): Modifier {
     val targetAlpha = if (state.isScrollInProgress) 1f else 0f
     val duration = if (state.isScrollInProgress) 150 else 500
+    val color = Color(0xFF5C5C5C)
 
     val alpha by animateFloatAsState(
         targetValue = targetAlpha,
-        animationSpec = tween(durationMillis = duration),
+        animationSpec = tween(durationMillis = duration), label = "animated_scroll",
     )
 
     return drawWithContent {

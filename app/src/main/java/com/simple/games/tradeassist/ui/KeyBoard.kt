@@ -35,22 +35,17 @@ fun KeyBoard(
     value: Float?,
     onEntered: (Float) -> Unit = {}
 ) {
-
-    var action by remember<MutableState<Action?>> {
-        mutableStateOf(null)
-    }
-
     var trigger by remember {
         mutableIntStateOf(0)
     }
     System.err.println(trigger)
 
-    val leftBuilder by remember {
-        mutableStateOf(StringBuilder(value?.toString() ?: ""))
+    var action by remember<MutableState<Action?>> {
+        mutableStateOf(null)
     }
 
-    var currentBuilder by remember {
-        mutableStateOf(leftBuilder)
+    val leftBuilder by remember {
+        mutableStateOf(StringBuilder(value?.toString() ?: ""))
     }
 
     val rightBuilder by remember {
@@ -124,7 +119,6 @@ fun KeyBoard(
                     .clickable {
                         if (leftBuilder.isNotEmpty()) {
                             action = Action.Plus
-                            currentBuilder = rightBuilder
                         }
                     }
                     .size(56.dp)
@@ -151,7 +145,7 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append("7")
+                        (if (action == null) leftBuilder else rightBuilder).append("7")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -169,7 +163,7 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append("8")
+                        (if (action == null) leftBuilder else rightBuilder).append("8")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -187,7 +181,7 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append("9")
+                        (if (action == null) leftBuilder else rightBuilder).append("9")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -207,7 +201,6 @@ fun KeyBoard(
                     .clickable {
                         if (leftBuilder.isNotEmpty()) {
                             action = Action.Divide
-                            currentBuilder = rightBuilder
                         }
                     }
                     .size(56.dp)
@@ -233,7 +226,7 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append("4")
+                        (if (action == null) leftBuilder else rightBuilder).append("4")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -251,7 +244,7 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append("5")
+                        (if (action == null) leftBuilder else rightBuilder).append("5")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -269,7 +262,7 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append("6")
+                        (if (action == null) leftBuilder else rightBuilder).append("6")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -289,7 +282,6 @@ fun KeyBoard(
                     .clickable {
                         if (leftBuilder.isNotEmpty()) {
                             action = Action.Multiply
-                            currentBuilder = rightBuilder
                         }
                     }
                     .size(56.dp)
@@ -314,7 +306,7 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append("1")
+                        (if (action == null) leftBuilder else rightBuilder).append("1")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -332,7 +324,7 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append("2")
+                        (if (action == null) leftBuilder else rightBuilder).append("2")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -350,7 +342,7 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append("3")
+                        (if (action == null) leftBuilder else rightBuilder).append("3")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -370,7 +362,6 @@ fun KeyBoard(
                     .clickable {
                         if (leftBuilder.isNotEmpty()) {
                             action = Action.Minus
-                            currentBuilder = rightBuilder
                         }
                     }
                     .size(56.dp)
@@ -400,7 +391,6 @@ fun KeyBoard(
                             rightBuilder.deleteCharAt(rightBuilder.length - 1)
                         } else if (action != null) {
                             action = null
-                            currentBuilder = leftBuilder
                         } else if (leftBuilder.isNotEmpty()) {
                             leftBuilder.deleteCharAt(leftBuilder.length - 1)
                         }
@@ -412,17 +402,16 @@ fun KeyBoard(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "DEL" + "",
+                    text = "DEL",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(0.dp)
                 )
-//                Image(painter = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.ArrowBack), contentDescription = null)
             }
             VerticalDivider(thickness = 0.5.dp)
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append("0")
+                        (if (action == null) leftBuilder else rightBuilder).append("0")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -440,7 +429,7 @@ fun KeyBoard(
             Box(
                 modifier = Modifier
                     .clickable {
-                        currentBuilder.append(".")
+                        (if (action == null) leftBuilder else rightBuilder).append(".")
                         trigger += 1
                     }
                     .size(56.dp)
@@ -466,11 +455,7 @@ fun KeyBoard(
                             .toFloatOrNull()
                         val act = action
                         if (f2 != null && act != null) {
-                            onEntered(
-                                act
-                                    .operate(f1, f2)
-                                    .round(2)
-                            )
+                            onEntered(act.operate(f1, f2).round(2))
                         } else {
                             onEntered(f1)
                         }
