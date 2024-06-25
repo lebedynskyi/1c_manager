@@ -24,8 +24,8 @@ android {
         applicationId = "com.simple.games.tradeassist"
         minSdk = 26
         targetSdk = 34
-        versionCode = 19
-        versionName = "0.1.9"
+        versionCode = 20
+        versionName = "0.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -33,10 +33,27 @@ android {
         }
     }
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("../tools/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+
+        create("release") {
+            storeFile = file("../tools/release.keystore")
+            keyAlias = "trade"
+            keyPassword = "tradeKey"
+            storePassword = "tradeKey"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             applicationIdSuffix  = ""
+            signingConfig = signingConfigs.getByName("release")
         }
 
         debug {
@@ -60,22 +77,6 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
-    signingConfigs {
-        getByName("debug") {
-            storeFile = file("../tools/debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-        }
-
-        create("release") {
-            storeFile = file("../tools/release.keystore")
-            keyAlias = "trade"
-            keyPassword = "tradeKey"
-            storePassword = "tradeKey"
         }
     }
 }
@@ -102,9 +103,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
-
-    // ---- Room
-    val room_version = "2.6.1"
 
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)

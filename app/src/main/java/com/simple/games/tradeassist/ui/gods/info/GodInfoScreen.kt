@@ -312,18 +312,18 @@ fun GodInfoScreenPreview() {
                 ), orderHistory = buildList {
                     add("2024-03-28 16:57:09" to GodOrderData().apply {
                         price = 22F
-                        amount = 133
+                        amount = 133F
                         sum = 1233.0F
                     })
 
                     add("2024-03-28 16:57:09" to GodOrderData().apply {
                         price = 22F
-                        amount = 133
+                        amount = 133F
                         sum = 123.0F
                     })
                     add("2024-03-28 16:57:09" to GodOrderData().apply {
                         price = 22F
-                        amount = 133
+                        amount = 133F
                         sum = 333.0F
                     })
                 })

@@ -25,7 +25,7 @@ class GodOrderData: java.io.Serializable {
     val measureKey: String? = null
 
     @SerialName("Количество")
-    var amount: Int? = null
+    var amount: Float? = null
 
     @SerialName("Цена")
     var price: Float? = null
