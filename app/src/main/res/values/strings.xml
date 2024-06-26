@@ -28,4 +28,5 @@
     <string name="save_order">Сохранить заказ</string>
     <string name="full_sync">Синхронизировать</string>
     <string name="loans">Долги</string>
+    <string name="app_name_new">"2C Заказы "</string>
 </resources>

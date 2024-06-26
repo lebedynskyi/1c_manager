@@ -56,7 +56,8 @@ class DataModule {
 
         return Retrofit.Builder()
             .client(httpClient)
-            .baseUrl("http://109.95.33.133:5252/krop/en_US/odata/standard.odata/")
+//            .baseUrl("http://109.95.33.133:5252/krop/en_US/odata/standard.odata/")
+            .baseUrl("http://5.61.39.68/Kropbase/uk/odata/standard.odata/")
             .addConverterFactory(json.asConverterFactory(contentType))
 
             .build()
