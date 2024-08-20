@@ -103,6 +103,11 @@ class CreateOrderViewModel @Inject constructor(
     }
 
     private fun handleCustomerNameChange(name: String) {
+        if (name == viewStateCopy.customerName) {
+            System.err.println("XXX: RECURSION !!!")
+            return
+        }
+
         val filtered = if (name.isBlank()) {
             emptyList()
         } else {

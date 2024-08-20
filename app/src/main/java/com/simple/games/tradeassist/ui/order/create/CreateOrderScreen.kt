@@ -32,6 +32,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -304,12 +305,12 @@ private fun ResponsibleDropDownMenu(
                 .defaultMinSize(minHeight = OutlinedTextFieldDefaults.MinHeight)
                 .fillMaxWidth()
                 .clickable { expanded = true }
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 .border(
                     OutlinedTextFieldDefaults.UnfocusedBorderThickness,
                     MaterialTheme.colorScheme.outline,
                     shape = OutlinedTextFieldDefaults.shape
                 )
-                .menuAnchor()
         ) {
             Text(
                 modifier = Modifier.padding(start = 12.dp),
@@ -319,7 +320,6 @@ private fun ResponsibleDropDownMenu(
         }
 
         ExposedDropdownMenu(
-            focusable = false,
             modifier = Modifier
                 .fillMaxWidth()
                 .exposedDropdownSize(),
@@ -366,24 +366,20 @@ private fun CustomersDropDownMenu(
     ExposedDropdownMenuBox(
         modifier = Modifier.fillMaxWidth(),
         expanded = suggestingCustomers.isNotEmpty(),
-        onExpandedChange = {
-            if (!it) onDismissDropDown()
-        }) {
+        onExpandedChange = { if (!it) onDismissDropDown() }) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(),
-            value = TextFieldValue(customerInput, selection = TextRange(customerInput.length)),
-            onValueChange = {
-                onCustomerNameChanged(it.text)
-            }, placeholder = {
+                .menuAnchor(MenuAnchorType.PrimaryEditable),
+            value = customerInput,
+            onValueChange = { onCustomerNameChanged(it) },
+            placeholder = {
                 Text(text = stringResource(id = R.string.customer))
             }, label = {
                 Text(text = stringResource(id = R.string.chose_customer))
             })
 
         ExposedDropdownMenu(
-            focusable = false,
             modifier = Modifier
                 .fillMaxWidth()
                 .exposedDropdownSize(),
