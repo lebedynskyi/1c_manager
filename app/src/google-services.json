@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "734461703552",
+    "project_id": "trade-assist-3e419",
+    "storage_bucket": "trade-assist-3e419.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734461703552:android:ccc8a93c9d533fc66b7d65",
+        "android_client_info": {
+          "package_name": "com.simple.games.tradeassist"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDr2kv3aAR5pRq3DtAq_3BQ71zxVv1ox6g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734461703552:android:8312cde940edb1626b7d65",
+        "android_client_info": {
+          "package_name": "com.simple.games.tradeassist.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDr2kv3aAR5pRq3DtAq_3BQ71zxVv1ox6g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

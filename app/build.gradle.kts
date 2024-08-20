@@ -1,36 +1,29 @@
 plugins {
-    kotlin("kapt")
+    kotlin("plugin.serialization") version "1.9.23"
+    id("com.google.devtools.ksp") version "2.0.10-1.0.24"
+
     alias(libs.plugins.android.hilt)
     alias(libs.plugins.android.application)
-
-    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id(libs.plugins.jetbrains.parcelize.get().pluginId)
-
-    kotlin("plugin.serialization") version "1.9.23"
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-}
-
-kapt {
-    correctErrorTypes = true
+    alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
     namespace = "com.simple.games.tradeassist"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.simple.games.tradeassist"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 21
-        versionName = "0.2.1"
+        targetSdk = 35
+        versionCode = 25
+        versionName = "0.2.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
     }
 
     signingConfigs {
@@ -65,19 +58,18 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    kotlinOptions {
+        jvmTarget = "17"
     }
 }
 
@@ -108,7 +100,7 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     // To use Kotlin annotation processing tool (kapt)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     // optional - Kotlin Extensions and Coroutines support for Room
 
     // _____________
@@ -120,7 +112,7 @@ dependencies {
 
     implementation(libs.hiltAndroid)
     implementation(libs.hiltNavigationCompose)
-    kapt(libs.hiltCompiler)
+    ksp(libs.hiltCompiler)
     // _____________
 
     androidTestImplementation(libs.androidx.junit)

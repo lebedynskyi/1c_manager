@@ -16,7 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -75,20 +75,20 @@ fun ContentLoadingContainer(
     onPullToRefresh: () -> Unit = {},
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val pullToRefreshState = rememberPullToRefreshState(enabled = { isRefreshInProgress })
+//    val pullToRefreshState = rememberPullToRefreshState(enabled = { isRefreshInProgress })
 
     Box(
         modifier = modifier.fillMaxSize()
     ) {
         content.invoke(this)
 
-        // TODO not working
-        if (isRefreshEnabled) {
-            PullToRefreshContainer(
-                modifier = Modifier.fillMaxSize(),
-                state = pullToRefreshState
-            )
-        }
+//        // TODO not working
+//        if (isRefreshEnabled) {
+//            PullToRefreshBox(
+//                modifier = Modifier.fillMaxSize(),
+//                state = pullToRefreshState
+//            )
+//        }
 
         if (isContentInProgress) {
             Surface(

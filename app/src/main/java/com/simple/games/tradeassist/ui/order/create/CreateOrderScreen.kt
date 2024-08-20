@@ -105,28 +105,12 @@ fun CreateOrderScreen(
             modifier = Modifier.padding(it),
             onAddGods = { onUIEvent(CreateOrderUIEvent.OnAddGods) },
             onSaveOrder = { onUIEvent(CreateOrderUIEvent.SaveOrder) },
-            onCustomerNameChanged = remember {
-                {
-                    onUIEvent(
-                        CreateOrderUIEvent.OnCustomerNameChange(
-                            it
-                        )
-                    )
-                }
-            },
-            onDismissDropDown = remember { { onUIEvent(CreateOrderUIEvent.OnDismissCustomerDropDown) } },
-            onCustomerSelected = remember { { onUIEvent(CreateOrderUIEvent.OnCustomerSelected(it)) } },
-            onRemoveGod = remember { { onUIEvent(CreateOrderUIEvent.OnGodRemoveClicked(it)) } },
-            onEditGod = remember { { onUIEvent(CreateOrderUIEvent.OnGodEditClick(it)) } },
-            onResponsibleSelected = remember {
-                {
-                    onUIEvent(
-                        CreateOrderUIEvent.OnResponsibleSelected(
-                            it
-                        )
-                    )
-                }
-            }
+            onCustomerNameChanged = { onUIEvent(CreateOrderUIEvent.OnCustomerNameChange(it)) },
+            onDismissDropDown = { onUIEvent(CreateOrderUIEvent.OnDismissCustomerDropDown) },
+            onCustomerSelected = { onUIEvent(CreateOrderUIEvent.OnCustomerSelected(it)) },
+            onRemoveGod = { onUIEvent(CreateOrderUIEvent.OnGodRemoveClicked(it)) },
+            onEditGod = { onUIEvent(CreateOrderUIEvent.OnGodEditClick(it)) },
+            onResponsibleSelected = { onUIEvent(CreateOrderUIEvent.OnResponsibleSelected(it)) }
         )
     }
 
@@ -172,6 +156,7 @@ fun CreateOrderScreenContent(
         )
 
         Spacer(modifier = Modifier.size(24.dp))
+
         ResponsibleDropDownMenu(
             responsbleName,
             responsibleList,
