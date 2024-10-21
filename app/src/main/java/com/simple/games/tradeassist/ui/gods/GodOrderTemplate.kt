@@ -1,6 +1,6 @@
 package com.simple.games.tradeassist.ui.gods
 
-import com.simple.games.tradeassist.domain.GodEntity
+import com.simple.games.tradeassist.domain.entity.GodEntity
 import kotlinx.serialization.Serializable
 
 @Serializable

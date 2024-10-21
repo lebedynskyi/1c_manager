@@ -4,11 +4,10 @@ import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.domain.C1Repository
-import com.simple.games.tradeassist.domain.OrderEntity
+import com.simple.games.tradeassist.domain.entity.OrderEntity
 import com.simple.games.tradeassist.ui.base.AppViewModel
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import javax.inject.Inject
 
 @HiltViewModel

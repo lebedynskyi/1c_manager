@@ -1,6 +1,6 @@
 package com.simple.games.tradeassist.ui.gods.list
 
-import com.simple.games.tradeassist.domain.GodEntity
+import com.simple.games.tradeassist.domain.entity.GodEntity
 
 data class TreeNode(
     val content: GodEntity,

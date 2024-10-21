@@ -10,8 +10,8 @@ import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.PriceData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.data.api.response.StorageRecordData
-import com.simple.games.tradeassist.domain.OrderConverter
-import com.simple.games.tradeassist.domain.OrderEntity
+import com.simple.games.tradeassist.domain.entity.OrderConverter
+import com.simple.games.tradeassist.domain.entity.OrderEntity
 
 @Database(
     version = 1,

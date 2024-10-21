@@ -80,16 +80,6 @@ fun ContentLoadingContainer(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-        content.invoke(this)
-
-//        // TODO not working
-//        if (isRefreshEnabled) {
-//            PullToRefreshBox(
-//                modifier = Modifier.fillMaxSize(),
-//                state = pullToRefreshState
-//            )
-//        }
-
         if (isContentInProgress) {
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -105,6 +95,8 @@ fun ContentLoadingContainer(
                     )
                 }
             }
+        } else {
+            content.invoke(this)
         }
     }
 }

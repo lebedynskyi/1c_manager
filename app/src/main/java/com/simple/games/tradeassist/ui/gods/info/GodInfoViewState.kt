@@ -1,7 +1,7 @@
 package com.simple.games.tradeassist.ui.gods.info
 
 import com.simple.games.tradeassist.data.api.response.GodOrderData
-import com.simple.games.tradeassist.domain.GodEntity
+import com.simple.games.tradeassist.domain.entity.GodEntity
 import com.simple.games.tradeassist.ui.base.AppViewState
 
 data class GodInfoViewState(

@@ -1,6 +1,6 @@
 package com.simple.games.tradeassist.ui.order
 
-import com.simple.games.tradeassist.domain.OrderEntity
+import com.simple.games.tradeassist.domain.entity.OrderEntity
 import com.simple.games.tradeassist.ui.base.AppViewState
 
 data class OrdersViewState(

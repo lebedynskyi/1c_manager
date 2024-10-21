@@ -1,7 +1,7 @@
 package com.simple.games.tradeassist.ui.order
 
 import com.simple.games.tradeassist.domain.C1Repository
-import com.simple.games.tradeassist.domain.OrderEntity
+import com.simple.games.tradeassist.domain.entity.OrderEntity
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.ui.base.AppViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

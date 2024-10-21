@@ -4,7 +4,7 @@ import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.core.navigation.AppRoute
 import com.simple.games.tradeassist.core.round
 import com.simple.games.tradeassist.domain.C1Repository
-import com.simple.games.tradeassist.domain.GodEntity
+import com.simple.games.tradeassist.domain.entity.GodEntity
 import com.simple.games.tradeassist.ui.base.AppViewModel
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import dagger.hilt.android.lifecycle.HiltViewModel

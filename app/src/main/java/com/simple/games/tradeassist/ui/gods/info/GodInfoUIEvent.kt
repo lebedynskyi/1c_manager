@@ -1,7 +1,7 @@
 package com.simple.games.tradeassist.ui.gods.info
 
 import com.simple.games.tradeassist.ui.base.AppUIEvent
-import com.simple.games.tradeassist.domain.GodEntity
+import com.simple.games.tradeassist.domain.entity.GodEntity
 
 sealed class GodInfoUIEvent : AppUIEvent() {
     data object OnAddClick : GodInfoUIEvent()

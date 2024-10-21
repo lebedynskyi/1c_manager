@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import com.simple.games.tradeassist.data.PrefDataSource
 import com.simple.games.tradeassist.data.api.C1ApiDataSource
 import com.simple.games.tradeassist.data.api.response.CustomerData
+import com.simple.games.tradeassist.data.api.response.DebtRecordData
 import com.simple.games.tradeassist.data.api.response.EmptyResponse
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.GodOrderData
@@ -13,6 +14,9 @@ import com.simple.games.tradeassist.data.api.response.PriceData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
 import com.simple.games.tradeassist.data.api.response.StorageRecordData
 import com.simple.games.tradeassist.data.db.DataBase
+import com.simple.games.tradeassist.domain.entity.CustomerDebtEntity
+import com.simple.games.tradeassist.domain.entity.GodEntity
+import com.simple.games.tradeassist.domain.entity.OrderEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,7 +29,7 @@ class C1Repository @Inject constructor(
     dispatcher: CoroutineDispatcher
 ) : CoroutineAware(dispatcher) {
 
-fun initialize() : Boolean {
+    fun initialize(): Boolean {
         val login = preference.getUserName() ?: return false
         val password = preference.getPassword() ?: return false
         apiDataSource.init(login, password)
@@ -185,9 +189,11 @@ fun initialize() : Boolean {
     suspend fun publishOrder(
         order: OrderEntity
     ): Result<EmptyResponse> {
-        val customer = order.customerKey?: return Result.failure(IllegalArgumentException("Customer is null"))
-        val responsible = order.responsibleKey?: return Result.failure(IllegalArgumentException("Responsible is null"))
-        val gods = order.gods?: return Result.failure(IllegalArgumentException("Gods is null"))
+        val customer =
+            order.customerKey ?: return Result.failure(IllegalArgumentException("Customer is null"))
+        val responsible = order.responsibleKey
+            ?: return Result.failure(IllegalArgumentException("Responsible is null"))
+        val gods = order.gods ?: return Result.failure(IllegalArgumentException("Gods is null"))
 
         return apiDataSource.publishOrder(customer, responsible, gods)
             .onSuccess {
@@ -248,6 +254,16 @@ fun initialize() : Boolean {
         }
 
         return itemsAmount
+    }
+
+    suspend fun getCustomerDebt(customerKey: String): Result<CustomerDebtEntity> {
+        return apiDataSource.getCustomerDebt(customerKey).map {
+            val plus = it.filter { it.recordType == "Receipt" }
+            val minus = it.filter { it.recordType == "Expense" }
+            val totalPlus = plus.sumOf { it.amount }
+            val totalMinus = minus.sumOf { it.amount }
+            CustomerDebtEntity(customerKey, plus, minus, totalPlus, totalMinus)
+        }
     }
 }
 

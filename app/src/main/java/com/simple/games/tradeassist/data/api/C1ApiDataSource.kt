@@ -3,6 +3,7 @@ package com.simple.games.tradeassist.data.api
 import com.simple.games.tradeassist.data.api.request.RequestPublishGod
 import com.simple.games.tradeassist.data.api.request.RequestPublishOrder
 import com.simple.games.tradeassist.data.api.response.CustomerData
+import com.simple.games.tradeassist.data.api.response.DebtRecordData
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.EmptyResponse
 import com.simple.games.tradeassist.data.api.response.GodsData
@@ -118,5 +119,14 @@ class C1ApiDataSource @Inject constructor(
 
     suspend fun getMeasure(): Result<List<MeasureData>> {
         return apiCall { c1Api.fetchMeasure(authKey) }.map { it.data }
+    }
+
+    suspend fun getCustomerDebt(customerKey: String): Result<List<DebtRecordData>> {
+        return apiCall {
+            c1Api.getCustomerDebt(
+                auth = authKey,
+                customerFilter = "Контрагент_Key eq guid'$customerKey'"
+            )
+        }.map { it.data }
     }
 }

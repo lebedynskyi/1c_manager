@@ -23,7 +23,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Done
-import androidx.compose.material.icons.outlined.Expand
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,15 +43,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.R
 import com.simple.games.tradeassist.core.theme.TradeAssistTheme
@@ -61,12 +56,10 @@ import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.PriceData
 import com.simple.games.tradeassist.data.api.response.ResponsibleData
-import com.simple.games.tradeassist.domain.GodEntity
+import com.simple.games.tradeassist.domain.entity.GodEntity
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
-import com.simple.games.tradeassist.ui.gods.list.GodsSelectionUIEvent
-import kotlin.math.exp
 
 @Composable
 fun CreateOrderScreen(
@@ -424,7 +417,8 @@ fun PreviewCreateOrder() {
                 filteredCustomers = listOf(CustomerData().apply { description = "Helo world" }),
                 orderTemplates = buildList {
                     add(
-                        GodOrderTemplate(GodEntity(
+                        GodOrderTemplate(
+                            GodEntity(
                             data = GodsData().apply {
                                 refKey = "122"
                                 description = "Кабель 2х234"

@@ -1,4 +1,4 @@
-package com.simple.games.tradeassist.domain
+package com.simple.games.tradeassist.domain.entity
 
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.MeasureData

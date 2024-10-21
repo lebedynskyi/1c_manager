@@ -1,5 +1,6 @@
-package com.simple.games.tradeassist.ui.loans
+package com.simple.games.tradeassist.ui.customers.list
 
+import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.ui.base.AppViewModel
@@ -16,8 +17,13 @@ class CustomersViewModel @Inject constructor(
         when (event) {
             CustomersUIEvent.OnScreenLoaded -> handleScreenLoaded()
             AppUIEvent.OnBackClicked -> handleBackClicked()
+            is CustomersUIEvent.OnCustomerClicked -> handleCustomerClicked(event.customer)
         }
         super.onUIEvent(event)
+    }
+
+    private fun handleCustomerClicked(customerData: CustomerData) = launch {
+        navigate { toCustomerDetails(customerData) }
     }
 
     private fun handleBackClicked() = launch {

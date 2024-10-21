@@ -35,12 +35,11 @@ import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.R
 import com.simple.games.tradeassist.core.orDefault
 import com.simple.games.tradeassist.core.theme.TradeAssistTheme
-import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.PriceData
-import com.simple.games.tradeassist.domain.GodEntity
-import com.simple.games.tradeassist.domain.OrderEntity
+import com.simple.games.tradeassist.domain.entity.GodEntity
+import com.simple.games.tradeassist.domain.entity.OrderEntity
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate

@@ -1,4 +1,4 @@
-package com.simple.games.tradeassist.domain
+package com.simple.games.tradeassist.domain.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

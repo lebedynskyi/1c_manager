@@ -4,6 +4,7 @@ import com.simple.games.tradeassist.data.api.request.RequestPublishOrder
 import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.DataResponse
+import com.simple.games.tradeassist.data.api.response.DebtRecordData
 import com.simple.games.tradeassist.data.api.response.EmptyResponse
 import com.simple.games.tradeassist.data.api.response.GodsData
 import com.simple.games.tradeassist.data.api.response.OrderHistoryData
@@ -54,4 +55,10 @@ interface C1Api {
         @Header("Authorization") auth: String?,
         @Body request: RequestPublishOrder
     ): Response<EmptyResponse>
+
+    @GET("AccumulationRegister_РасчетыСПокупателями_RecordType?\$format=json")
+    suspend fun getCustomerDebt(
+        @Header("Authorization") auth: String?,
+        @Query("\$filter") customerFilter: String
+    ) :Response<DataResponse<DebtRecordData>>
 }

@@ -7,7 +7,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.simple.games.tradeassist.domain.GodEntity
+import com.simple.games.tradeassist.data.api.response.CustomerData
+import com.simple.games.tradeassist.domain.entity.GodEntity
+import com.simple.games.tradeassist.ui.customers.details.CustomerDetailScreen
+import com.simple.games.tradeassist.ui.customers.details.CustomerDetailUIEvent
+import com.simple.games.tradeassist.ui.customers.details.CustomerDetailViewModel
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import com.simple.games.tradeassist.ui.gods.info.GodInfoScreen
 import com.simple.games.tradeassist.ui.gods.info.GodInfoUIEvent
@@ -15,9 +19,9 @@ import com.simple.games.tradeassist.ui.gods.info.GodInfoViewModel
 import com.simple.games.tradeassist.ui.gods.list.GodsSelectionScreen
 import com.simple.games.tradeassist.ui.gods.list.GodsSelectionUIEvent
 import com.simple.games.tradeassist.ui.gods.list.GodsSelectionViewModel
-import com.simple.games.tradeassist.ui.loans.CustomersScreen
-import com.simple.games.tradeassist.ui.loans.CustomersUIEvent
-import com.simple.games.tradeassist.ui.loans.CustomersViewModel
+import com.simple.games.tradeassist.ui.customers.list.CustomersScreen
+import com.simple.games.tradeassist.ui.customers.list.CustomersUIEvent
+import com.simple.games.tradeassist.ui.customers.list.CustomersViewModel
 import com.simple.games.tradeassist.ui.login.LoginScreen
 import com.simple.games.tradeassist.ui.login.LoginUIEvent
 import com.simple.games.tradeassist.ui.login.LoginViewModel
@@ -114,7 +118,7 @@ fun NavGraphBuilder.applicationListNavGraph(
     }
 
 
-    composable(AppRoute.CustomersRoute.route) {
+    composable(AppRoute.CustomersListRoute.route) {
         val viewModel = hiltViewModel<CustomersViewModel>()
         val state by viewModel.viewState.collectAsState()
 
@@ -123,5 +127,17 @@ fun NavGraphBuilder.applicationListNavGraph(
         }
 
         CustomersScreen(state, onUIEvent = viewModel::onUIEvent)
+    }
+
+    composable(AppRoute.CustomersDetailsRoute.route) {
+        val viewModel = hiltViewModel<CustomerDetailViewModel>()
+        val state by viewModel.viewState.collectAsState()
+
+        LaunchedEffect(key1 = Unit) {
+            val customer = controller.getArgument<CustomerData>(AppRoute.CustomersDetailsRoute.argCustomer) ?: return@LaunchedEffect
+            viewModel.onUIEvent(CustomerDetailUIEvent.ScreenLoaded(customer))
+        }
+
+        CustomerDetailScreen(state, onUIEvent = viewModel::onUIEvent)
     }
 }
