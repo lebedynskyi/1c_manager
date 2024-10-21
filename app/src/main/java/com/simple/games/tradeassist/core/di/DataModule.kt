@@ -6,6 +6,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.simple.games.tradeassist.data.AndroidNetworkStateDataSource
 import com.simple.games.tradeassist.data.api.C1Api
 import com.simple.games.tradeassist.data.db.DataBase
+import com.simple.games.tradeassist.data.db.MIGRATION_1_2
 import com.simple.games.tradeassist.domain.NetworkStateDataSource
 import dagger.Module
 import dagger.Provides
@@ -33,7 +34,7 @@ class DataModule {
         return Room.databaseBuilder(
             applicationContext,
             DataBase::class.java, "trade-assist.db"
-        ).build()
+        ).addMigrations(MIGRATION_1_2).build()
     }
 
     @Provides
@@ -44,7 +45,7 @@ class DataModule {
         val json = Json {
             ignoreUnknownKeys = true
             isLenient = true
-            encodeDefaults=true
+            encodeDefaults = true
             serializersModule = SerializersModule {
                 contextual(String.serializer())
                 contextual(Int.serializer())

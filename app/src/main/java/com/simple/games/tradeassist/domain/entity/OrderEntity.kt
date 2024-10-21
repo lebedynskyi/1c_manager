@@ -7,6 +7,7 @@ import androidx.room.TypeConverter
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import java.util.Date
 
 @Entity("orders")
 class OrderEntity {
@@ -16,6 +17,9 @@ class OrderEntity {
 
     @ColumnInfo("refKey")
     var refKey: String? = null
+
+   @ColumnInfo("publishDate")
+    var publishDate: Date? = null
 
     @ColumnInfo("customerKey")
     var customerKey: String? = null
@@ -28,6 +32,9 @@ class OrderEntity {
 
     @ColumnInfo("responsibleName")
     var responsibleName: String? = null
+
+    @ColumnInfo("orderComment")
+    var comment: String? = null
 
     @ColumnInfo("gods")
     var gods: List<GodOrderTemplate>? = null
@@ -47,5 +54,15 @@ class OrderConverter {
     @TypeConverter
     fun jsonToList(value: String): List<GodOrderTemplate> {
         return json.decodeFromString(ListSerializer(GodOrderTemplate.serializer()), value)
+    }
+
+    @TypeConverter
+    fun dateToLong(value: Date?): Long? {
+        return value?.time
+    }
+
+    @TypeConverter
+    fun longToDate(value: Long?): Date? {
+        return value?.let { Date(it) }
     }
 }

@@ -18,6 +18,9 @@ import com.simple.games.tradeassist.domain.entity.CustomerDebtEntity
 import com.simple.games.tradeassist.domain.entity.GodEntity
 import com.simple.games.tradeassist.domain.entity.OrderEntity
 import kotlinx.coroutines.CoroutineDispatcher
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -194,10 +197,13 @@ class C1Repository @Inject constructor(
         val responsible = order.responsibleKey
             ?: return Result.failure(IllegalArgumentException("Responsible is null"))
         val gods = order.gods ?: return Result.failure(IllegalArgumentException("Gods is null"))
+        val currentDate = Calendar.getInstance().time
 
-        return apiDataSource.publishOrder(customer, responsible, gods)
+        return apiDataSource.publishOrder(
+            customer, responsible, gods, order.comment, currentDate)
             .onSuccess {
                 order.refKey = "TODO"
+                order.publishDate = currentDate
                 dataBase.ordersDao().insert(order)
             }
     }

@@ -43,6 +43,7 @@ import com.simple.games.tradeassist.domain.entity.OrderEntity
 import com.simple.games.tradeassist.ui.base.design.AppTopBar
 import com.simple.games.tradeassist.ui.base.design.ContentLoadingIndicator
 import com.simple.games.tradeassist.ui.gods.GodOrderTemplate
+import java.util.Calendar
 
 @Composable
 fun OrdersScreen(
@@ -205,16 +206,39 @@ private fun OrderItem(
             }
             HorizontalDivider(thickness = 0.5.dp)
 
-            if (order.refKey.isNullOrBlank()) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1F),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                        onClick = { onDeleteClick(order) }) {
-                        Text(text = "Удалить")
-                    }
+            order.comment?.let {
+                Column {
+                    Text(text = "Комментарий: ")
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                HorizontalDivider(thickness = 0.5.dp)
+            }
+
+            order.publishDate?.let {
+                Column {
+                    Text(text = "Дата публикации: ")
+                    Text(
+                        text = it.toString(),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                HorizontalDivider(thickness = 0.5.dp)
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1F),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    onClick = { onDeleteClick(order) }) {
+                    Text(text = "Удалить")
+                }
+                if (order.refKey.isNullOrBlank()) {
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -227,7 +251,9 @@ private fun OrderItem(
                         )
                     }
                 }
+            }
 
+            if (order.refKey.isNullOrBlank()) {
                 Button(modifier = Modifier.fillMaxWidth(),
                     onClick = { onPublishClick(order) }) {
                     Text(text = "Опубликовать")
@@ -245,6 +271,7 @@ fun PreviewOrdersScreen() {
             OrderEntity().apply {
                 customerName = "ФОП Скай лаб моторс покупатель"
                 responsibleName = "Алина"
+                publishDate = Calendar.getInstance().time
                 gods = listOf(
                     GodOrderTemplate(
                         GodEntity(

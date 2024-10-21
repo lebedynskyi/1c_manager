@@ -96,9 +96,10 @@ fun CreateOrderScreen(
             addGodsEnabled = state.addGodsEnabled,
             gods = state.orderTemplates,
             responsibleList = state.responsible,
+            comment = state.orderComment,
             modifier = Modifier.padding(it),
             onAddGods = { onUIEvent(CreateOrderUIEvent.OnAddGods) },
-            onSaveOrder = { onUIEvent(CreateOrderUIEvent.SaveOrder) },
+            onCommentChanged = {onUIEvent(CreateOrderUIEvent.OnCommentChanged(it))},
             onCustomerNameChanged = { onUIEvent(CreateOrderUIEvent.OnCustomerNameChange(it)) },
             onDismissDropDown = { onUIEvent(CreateOrderUIEvent.OnDismissCustomerDropDown) },
             onCustomerSelected = { onUIEvent(CreateOrderUIEvent.OnCustomerSelected(it)) },
@@ -119,11 +120,12 @@ fun CreateOrderScreenContent(
     responsbleName: String?,
     gods: List<GodOrderTemplate>?,
     addGodsEnabled: Boolean,
+    comment: String?,
     customers: List<CustomerData>,
     responsibleList: List<ResponsibleData>?,
     modifier: Modifier = Modifier,
     onAddGods: () -> Unit,
-    onSaveOrder: () -> Unit,
+    onCommentChanged: (String) -> Unit,
     onCustomerNameChanged: (String) -> Unit,
     onDismissDropDown: () -> Unit,
     onCustomerSelected: (CustomerData) -> Unit,
@@ -156,6 +158,17 @@ fun CreateOrderScreenContent(
             responsibleList,
             onResponsibleSelected
         )
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = comment.orEmpty(),
+            onValueChange = { onCommentChanged(it) },
+            placeholder = {
+                Text(text = stringResource(id = R.string.comment))
+            }, label = {
+                Text(text = stringResource(id = R.string.comment))
+            })
+
 
         Spacer(Modifier.size(12.dp))
         HorizontalDivider(modifier = Modifier.padding(), thickness = 0.5.dp)

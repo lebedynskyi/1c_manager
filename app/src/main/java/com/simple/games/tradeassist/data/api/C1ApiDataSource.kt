@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import java.text.SimpleDateFormat
 import java.util.Base64
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
@@ -27,7 +28,6 @@ class C1ApiDataSource @Inject constructor(
 
     private var authKey: String? = null
     private val c1DateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-
 
     fun init(user: String, pass: String) {
         val key = "Basic " + Base64.getEncoder().encodeToString("$user:$pass".toByteArray())
@@ -44,10 +44,12 @@ class C1ApiDataSource @Inject constructor(
     suspend fun publishOrder(
         customerKey: String,
         responsibleKey: String,
-        gods: List<GodOrderTemplate>
+        gods: List<GodOrderTemplate>,
+        comment: String?,
+        date: Date
     ): Result<EmptyResponse> {
-        val currentDate = c1DateFormatter.format(Calendar.getInstance().time)
         val orderSum = gods.map { it.sum }.sum()
+        val currentDate = c1DateFormatter.format(date)
 
         return apiCall {
             c1Api.publishOrder(auth = authKey, RequestPublishOrder(
@@ -56,6 +58,7 @@ class C1ApiDataSource @Inject constructor(
                 date = currentDate,
                 dateOfDelivery = currentDate,
                 orderSum = orderSum,
+                comment = comment.orEmpty(),
                 orderGods = gods.mapIndexed { index, it ->
                     RequestPublishGod(
                         godRefKey = it.godEntity.data.refKey,

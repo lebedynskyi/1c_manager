@@ -11,5 +11,6 @@ data class CreateOrderViewState(
     var addGodsEnabled: Boolean = false,
     var filteredCustomers: List<CustomerData> = emptyList(),
     var orderTemplates: List<GodOrderTemplate>? = null,
+    var orderComment: String? = null,
     var responsible: List<ResponsibleData>? = null
 ) : AppViewState()

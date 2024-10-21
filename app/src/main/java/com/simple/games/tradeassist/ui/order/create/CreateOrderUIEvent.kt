@@ -11,6 +11,7 @@ sealed class CreateOrderUIEvent : AppUIEvent() {
     data object SaveOrder: CreateOrderUIEvent()
     data object OnDismissCustomerDropDown: CreateOrderUIEvent()
     data class OnCustomerNameChange(val name: String): CreateOrderUIEvent()
+    data class OnCommentChanged(val orderComment: String): CreateOrderUIEvent()
     data class OnCustomerSelected(val customer: CustomerData): CreateOrderUIEvent()
     data class OnResponsibleSelected(val responsible: ResponsibleData): CreateOrderUIEvent()
     data class OnGodRemoveClicked(val god: GodOrderTemplate): CreateOrderUIEvent()

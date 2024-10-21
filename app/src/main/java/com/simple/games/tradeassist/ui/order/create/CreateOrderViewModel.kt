@@ -27,9 +27,14 @@ class CreateOrderViewModel @Inject constructor(
         when (event) {
             is AppUIEvent.OnBackClicked -> handleBackClicked()
 
-            is CreateOrderUIEvent.OnScreenLoaded -> handleScreenLoaded(event.draftId, event.editedGod)
+            is CreateOrderUIEvent.OnScreenLoaded -> handleScreenLoaded(
+                event.draftId,
+                event.editedGod
+            )
+
             is CreateOrderUIEvent.OnAddGods -> handleAddGods()
             is CreateOrderUIEvent.OnCustomerNameChange -> handleCustomerNameChange(event.name)
+            is CreateOrderUIEvent.OnCommentChanged -> handleCommentChanged(event.orderComment)
             is CreateOrderUIEvent.OnDismissCustomerDropDown -> handleDismissCustomerDropDown()
             is CreateOrderUIEvent.OnCustomerSelected -> handleCustomerSelected(event.customer)
             is CreateOrderUIEvent.OnResponsibleSelected -> handleResponsibleSelected(event.responsible)
@@ -101,9 +106,16 @@ class CreateOrderViewModel @Inject constructor(
         }
     }
 
+    private fun handleCommentChanged(comment: String) = launch {
+        currentDraft.comment = comment
+        reduce {
+            orderComment = comment
+        }
+        repository.saveOrder(currentDraft)
+    }
+
     private fun handleCustomerNameChange(name: String) {
         if (name == viewStateCopy.customerName) {
-            System.err.println("XXX: RECURSION !!!")
             return
         }
 
@@ -133,7 +145,7 @@ class CreateOrderViewModel @Inject constructor(
 
         editedGod?.let {
             currentDraft.gods = buildList {
-                currentDraft.gods?.forEach {existed ->
+                currentDraft.gods?.forEach { existed ->
                     if (existed.godEntity.data.refKey == editedGod.godEntity.data.refKey) {
                         add(editedGod)
                     } else {
@@ -145,6 +157,7 @@ class CreateOrderViewModel @Inject constructor(
             repository.saveOrder(currentDraft)
 
             reduce {
+                orderComment = currentDraft.comment
                 orderTemplates = currentDraft.gods
             }
         }
@@ -154,8 +167,8 @@ class CreateOrderViewModel @Inject constructor(
                 loadedCustomers.clear()
                 loadedCustomers.addAll(it.sortedBy { it.description?.lowercase() ?: "" })
             }
-
         }
+
         if (loadedResponsible.isEmpty()) {
             repository.getResponsible().onSuccess {
                 loadedResponsible.clear()
@@ -169,6 +182,7 @@ class CreateOrderViewModel @Inject constructor(
             orderTemplates = currentDraft.gods
             responsible = loadedResponsible
             requestInProgress = false
+            orderComment = currentDraft.comment
             addGodsEnabled = !currentDraft.customerKey.isNullOrBlank()
         }
     }

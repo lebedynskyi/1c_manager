@@ -9,12 +9,17 @@ plugins {
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("androidx.room")
     alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
     namespace = "com.simple.games.tradeassist"
     compileSdk = 35
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 
     defaultConfig {
         applicationId = "com.simple.games.tradeassist"

@@ -1,0 +1,334 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "63f11c94899976f38f21868426606a10",
+    "entities": [
+      {
+        "tableName": "customers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`refKey` TEXT NOT NULL, `parentKey` TEXT NOT NULL, `isFolder` INTEGER NOT NULL, `description` TEXT, `contactInfo` TEXT, PRIMARY KEY(`refKey`))",
+        "fields": [
+          {
+            "fieldPath": "refKey",
+            "columnName": "refKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentKey",
+            "columnName": "parentKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFolder",
+            "columnName": "isFolder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "contact",
+            "columnName": "contactInfo",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "refKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "measure",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`refKey` TEXT NOT NULL, `internationalName` TEXT, PRIMARY KEY(`refKey`))",
+        "fields": [
+          {
+            "fieldPath": "refKey",
+            "columnName": "refKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "internationalName",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "refKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "gods",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`refKey` TEXT NOT NULL, `parentKey` TEXT, `imageFileKey` TEXT, `measureKey` TEXT, `isFolder` INTEGER NOT NULL, `code` TEXT, `description` TEXT, PRIMARY KEY(`refKey`))",
+        "fields": [
+          {
+            "fieldPath": "refKey",
+            "columnName": "refKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentKey",
+            "columnName": "parentKey",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "imageKey",
+            "columnName": "imageFileKey",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "measureKey",
+            "columnName": "measureKey",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isFolder",
+            "columnName": "isFolder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "refKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "storage",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `godRefKey` TEXT NOT NULL, `period` TEXT, `amount` REAL, `recordType` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "godKey",
+            "columnName": "godRefKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "period",
+            "columnName": "period",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "recorderType",
+            "columnName": "recordType",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "responsible",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`refKey` TEXT NOT NULL, `name` TEXT, PRIMARY KEY(`refKey`))",
+        "fields": [
+          {
+            "fieldPath": "refKey",
+            "columnName": "refKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "refKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "price",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` TEXT, `priceTypeKey` TEXT, `priceTypeName` TEXT, `godKey` TEXT, `price` REAL, `actual` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "localId",
+            "columnName": "localId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "priceTypeKey",
+            "columnName": "priceTypeKey",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "priceTypeName",
+            "columnName": "priceTypeName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "godKey",
+            "columnName": "godKey",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "priceValue",
+            "columnName": "price",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "actual",
+            "columnName": "actual",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "localId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "orders",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `refKey` TEXT, `publishDate` INTEGER, `customerKey` TEXT, `customerName` TEXT, `responsibleKey` TEXT, `responsibleName` TEXT, `orderComment` TEXT, `gods` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "localId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "refKey",
+            "columnName": "refKey",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "publishDate",
+            "columnName": "publishDate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "customerKey",
+            "columnName": "customerKey",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "customerName",
+            "columnName": "customerName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "responsibleKey",
+            "columnName": "responsibleKey",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "responsibleName",
+            "columnName": "responsibleName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "comment",
+            "columnName": "orderComment",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "gods",
+            "columnName": "gods",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "localId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '63f11c94899976f38f21868426606a10')"
+    ]
+  }
+}
