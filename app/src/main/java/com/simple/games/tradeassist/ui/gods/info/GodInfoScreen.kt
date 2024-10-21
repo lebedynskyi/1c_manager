@@ -43,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.R
+import com.simple.games.tradeassist.core.format
 import com.simple.games.tradeassist.core.theme.TradeAssistTheme
 import com.simple.games.tradeassist.data.api.response.MeasureData
 import com.simple.games.tradeassist.data.api.response.GodOrderData
@@ -97,6 +98,7 @@ fun GodInfoScreen(
             state.godsEntity,
             state.orderHistory,
             state.historyName,
+            state.debtAmount,
             modifier = Modifier.padding(it),
             onAmountPressed = { showAmountKeyboard = true },
             onPricePressed = { showPriceKeyboard = true },
@@ -146,6 +148,7 @@ fun GodInfoScreenContent(
     godEntity: GodEntity?,
     orderHistory: List<Pair<String, GodOrderData>>?,
     historyName: String?,
+    debtForCustomer: Double? = null,
     modifier: Modifier = Modifier,
     onAmountPressed: () -> Unit = {},
     onPricePressed: () -> Unit = {},
@@ -261,20 +264,41 @@ fun GodInfoScreenContent(
                     )
                 }
             }
-
-            HorizontalDivider(thickness = 0.5.dp)
-            Text(text = "История покупок для $historyName:")
-
-            for ((date, god) in orderHistory.orEmpty()) {
+            debtForCustomer?.let {
+                HorizontalDivider(thickness = 0.5.dp)
                 Row {
                     Text(
-                        modifier = Modifier.weight(1F), text = date.substring(0, 10)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        text = "Текущий долг $historyName:"
                     )
+                    Text(
+                        text = debtForCustomer.format("грн"),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
 
-                    Text(text = "${god.price} грн (${god.sum} грн / ${god.amount}${godEntity.measureData?.name})")
+            historyName?.let {
+                HorizontalDivider(thickness = 0.5.dp)
+                Text(text = "История покупок $historyName:")
+                if (orderHistory.isNullOrEmpty()) {
+                    Text(text = "Нет истории для $historyName:")
+                } else {
+                    for ((date, god) in orderHistory) {
+                        Row {
+                            Text(
+                                modifier = Modifier.weight(1F), text = date.substring(0, 10)
+                            )
+
+                            Text(text = "${god.price} грн (${god.sum} грн / ${god.amount}${godEntity.measureData?.name})")
+                        }
+                    }
                 }
             }
         }
+
         Button(modifier = Modifier.fillMaxWidth(),
             enabled = addBtnEnabled,
             onClick = { onAddClicked() }) {
@@ -309,7 +333,8 @@ fun GodInfoScreenPreview() {
                         this.priceValue = 11.6F
                         this.priceTypeName = "Актальная цена"
                     })
-                ), orderHistory = buildList {
+                ),
+                orderHistory = buildList {
                     add("2024-03-28 16:57:09" to GodOrderData().apply {
                         price = 22F
                         amount = 133F
@@ -326,7 +351,8 @@ fun GodInfoScreenPreview() {
                         amount = 133F
                         sum = 333.0F
                     })
-                })
+                },
+            )
         )
     }
 }

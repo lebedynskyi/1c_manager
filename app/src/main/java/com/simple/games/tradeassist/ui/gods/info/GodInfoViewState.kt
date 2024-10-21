@@ -12,5 +12,6 @@ data class GodInfoViewState(
     var addBtnEnabled: Boolean = false,
     var amount: Float? = null,
     var price: Float? = null,
-    var marga: Float? = null
+    var marga: Float? = null,
+    var debtAmount: Double? = null
 ) : AppViewState()

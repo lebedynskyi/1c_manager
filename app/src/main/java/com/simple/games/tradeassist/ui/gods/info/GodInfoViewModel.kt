@@ -24,7 +24,14 @@ class GodInfoViewModel @Inject constructor(
         when (event) {
             is AppUIEvent.OnBackClicked -> handleBackClicked()
 
-            is GodInfoUIEvent.OnScreenLoaded -> handleScreenLoaded(event.god, event.customerName, event.customerKey, event.price, event.amount)
+            is GodInfoUIEvent.OnScreenLoaded -> handleScreenLoaded(
+                event.god,
+                event.customerName,
+                event.customerKey,
+                event.price,
+                event.amount
+            )
+
             is GodInfoUIEvent.OnAddClick -> handleOnAddGods()
             is GodInfoUIEvent.OnAmountChanged -> handleAmountChanged(event.amount)
             is GodInfoUIEvent.OnPriceChanged -> handlePriceChanged(event.price)
@@ -47,7 +54,7 @@ class GodInfoViewModel @Inject constructor(
         reduce {
             val price = price
             this.amount = amount
-            this. addBtnEnabled = price != null && price > 0
+            this.addBtnEnabled = price != null && price > 0
         }
     }
 
@@ -58,7 +65,7 @@ class GodInfoViewModel @Inject constructor(
         if (price == null || price <= 0) {
             reduce {
                 addBtnEnabled = false
-                 this.marga = 0.00F
+                this.marga = 0.00F
             }
         }
 
@@ -68,7 +75,7 @@ class GodInfoViewModel @Inject constructor(
 
             val price1 = currentGod?.price?.getOrNull(0)?.priceValue
             val price2 = currentGod?.price?.getOrNull(1)?.priceValue
-            if (price1 != null && price1 > 0F && price2 !=null && price2 > 0F && price != null) {
+            if (price1 != null && price1 > 0F && price2 != null && price2 > 0F && price != null) {
                 val min = min(price1, price2)
                 marga = ((price - min) / (min / 100.0F)).round(2)
             }
@@ -97,31 +104,33 @@ class GodInfoViewModel @Inject constructor(
 
                 val price1 = god.price.getOrNull(0)?.priceValue
                 val price2 = god.price.getOrNull(1)?.priceValue
-                if (price1 != null && price1 != 0F && price2 !=null && price2 != 0F) {
+                if (price1 != null && price1 != 0F && price2 != null && price2 != 0F) {
                     val max = max(price1, price2)
                     val min = min(price1, price2)
 
-                    if (enteredPrice != null){
+                    if (enteredPrice != null) {
                         this.price = enteredPrice
                         this.marga = ((enteredPrice - min) / (min / 100.0F)).round(2)
                     } else {
                         this.price = max
                         this.marga = ((max - min) / (min / 100.0F)).round(2)
                     }
-                } else if (enteredPrice != null){
+                } else if (enteredPrice != null) {
                     this.price = enteredPrice
                 }
             }
         }
 
         customerKey?.let {
-            c1Repository.getOrderHistory(it, god.data.refKey)
-                .onSuccess {
-                    reduce {
-                        orderHistory = if (it.size > 7) it.subList(0, 6) else it
-                        historyName = customerName
-                    }
-                }
+            val history = c1Repository.getOrderHistory(it, god.data.refKey).getOrNull()
+            val debt = c1Repository.getCustomerDebt(it).getOrNull()
+            val debtAmount = (debt?.totalPlus ?: 0.0) - (debt?.totalMinus ?: 0.0)
+
+            reduce {
+                orderHistory = if ((history?.size ?: 0) > 7) history?.subList(0, 6) else history
+                historyName = customerName
+                this.debtAmount = debtAmount
+            }
         }
     }
 
