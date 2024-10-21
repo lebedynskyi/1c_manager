@@ -143,7 +143,6 @@ fun GodsSelectionScreenContent(
 ) {
     var refreshTrigger by remember { mutableIntStateOf(0) }
     val scrollState = rememberLazyListState()
-    System.err.println("Trigger -> $refreshTrigger, list size -> ${godsList.size}")
 
     ContentLoadingContainer(
         isContentInProgress = contentInProgress,
@@ -180,6 +179,8 @@ fun GodsSelectionScreenContent(
                         .verticalScrollbar(scrollState),
                     state = scrollState
                 ) {
+                    System.err.println("Trigger -> $refreshTrigger, list size -> ${godsList.size}")
+
                     for (t in godsList) {
                         TreeBranch(t, orders = ordersList) {
                             if (it.content.data.isFolder) {
