@@ -30,7 +30,6 @@ class CustomerData : java.io.Serializable {
     @SerialName("Description")
     var description: String? = null
 
-    // TODO not used info ?
     @ColumnInfo(name = "contactInfo")
     @SerialName("КонтактнаяИнформация")
     var contact: List<CustomerContactData>? = null
@@ -39,7 +38,7 @@ class CustomerData : java.io.Serializable {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as GodsData
+        other as CustomerData
 
         return refKey == other.refKey
     }

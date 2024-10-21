@@ -20,13 +20,13 @@ class MainViewModel @Inject constructor(
             MainUIEvent.OnOrderClick -> handleOrdersClick()
             MainUIEvent.OnGodsClick -> handleOnGodsClick()
             MainUIEvent.OnSyncClicked -> handleSyncClicked()
-            MainUIEvent.OnLoansClicked -> handleLoansClicked()
+            MainUIEvent.OnCustomersClicked -> handleCustomersClicked()
         }
         super.onUIEvent(event)
     }
     
-    private fun handleLoansClicked() = launch {
-        navigate { toLoans() }
+    private fun handleCustomersClicked() = launch {
+        navigate { toCustomers() }
     }
 
     private fun handleScreenLoaded() = launch {

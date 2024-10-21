@@ -162,10 +162,10 @@ fun GodsSelectionScreenContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
+                    text = "Показать ВСЕ",
                     modifier = Modifier
                         .padding(start = 12.dp)
-                        .weight(1F),
-                    text = "Показать ВСЕ"
+                        .weight(1F)
                 )
                 Switch(modifier = Modifier.padding(horizontal = 12.dp),
                     checked = showAll, onCheckedChange = {

@@ -1,19 +1,20 @@
 package com.simple.games.tradeassist.ui.loans
 
+import com.simple.games.tradeassist.domain.C1Repository
 import com.simple.games.tradeassist.ui.base.AppUIEvent
 import com.simple.games.tradeassist.ui.base.AppViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class LoansViewModel @Inject constructor(
-
-) : AppViewModel<LoansViewState>(LoansViewState(33)) {
+class CustomersViewModel @Inject constructor(
+    private val repository: C1Repository
+) : AppViewModel<CustomersViewState>(CustomersViewState(emptyList())) {
     override val viewStateCopy get() = viewState.value.copy()
 
     override fun onUIEvent(event: AppUIEvent) {
         when (event) {
-            LoansUIEvent.OnScreenLoaded -> handleScreenLoaded()
+            CustomersUIEvent.OnScreenLoaded -> handleScreenLoaded()
             AppUIEvent.OnBackClicked -> handleBackClicked()
         }
         super.onUIEvent(event)
@@ -23,7 +24,11 @@ class LoansViewModel @Inject constructor(
         navigate { toBack() }
     }
 
-    private fun handleScreenLoaded() {
-
+    private fun handleScreenLoaded() = launch {
+        repository.getCustomers().onSuccess {
+            reduce {
+                customers = it.sortedBy { it.description }
+            }
+        }
     }
 }

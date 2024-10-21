@@ -15,6 +15,7 @@ import com.simple.games.tradeassist.domain.OrderEntity
 
 @Database(
     version = 1,
+    exportSchema = false,
     entities = [CustomerData::class,
         MeasureData::class,
         GodsData::class,

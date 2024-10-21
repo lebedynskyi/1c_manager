@@ -3,7 +3,6 @@ package com.simple.games.tradeassist.core.navigation
 import android.app.Activity
 import android.content.Context
 import androidx.navigation.NavHostController
-import com.simple.games.tradeassist.data.api.response.CustomerData
 import com.simple.games.tradeassist.domain.GodEntity
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -61,8 +60,8 @@ class Navigator @Inject constructor() {
         controller?.navigate(AppRoute.CreateOrder.route)
     }
 
-    fun toLoans(){
-        controller?.navigate(AppRoute.LoansRoute.route)
+    fun toCustomers(){
+        controller?.navigate(AppRoute.CustomersRoute.route)
     }
 }
 

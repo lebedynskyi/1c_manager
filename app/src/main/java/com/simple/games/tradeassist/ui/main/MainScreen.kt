@@ -33,7 +33,7 @@ fun MainScreen(
         MainScreenContent(modifier = Modifier.padding(it),
             onOrderClick = { onUIEvent(MainUIEvent.OnOrderClick) },
             onGodsClick = { onUIEvent(MainUIEvent.OnGodsClick) },
-            onLoansClicked = { onUIEvent(MainUIEvent.OnLoansClicked) },
+            onCustomersClicked = { onUIEvent(MainUIEvent.OnCustomersClicked) },
             onSyncClicked = { onUIEvent(MainUIEvent.OnSyncClicked) })
     }
 
@@ -45,7 +45,7 @@ fun MainScreenContent(
     modifier: Modifier = Modifier,
     onOrderClick: () -> Unit,
     onGodsClick: () -> Unit,
-    onLoansClicked: () -> Unit,
+    onCustomersClicked: () -> Unit,
     onSyncClicked: () -> Unit
 ) {
     Box {
@@ -70,8 +70,8 @@ fun MainScreenContent(
 
             Button(modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp), onClick = { onLoansClicked() }) {
-                Text(text = stringResource(R.string.loans))
+                .height(48.dp), onClick = { onCustomersClicked() }) {
+                Text(text = stringResource(R.string.customers))
             }
         }
 
