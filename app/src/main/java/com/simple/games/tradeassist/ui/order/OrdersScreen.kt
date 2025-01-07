@@ -228,17 +228,17 @@ private fun OrderItem(
                 HorizontalDivider(thickness = 0.5.dp)
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (order.refKey.isNullOrBlank()) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1F),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        onClick = { onDeleteClick(order) }) {
+                        Text(text = "Удалить")
+                    }
 
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1F),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    onClick = { onDeleteClick(order) }) {
-                    Text(text = "Удалить")
-                }
-                if (order.refKey.isNullOrBlank()) {
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -251,9 +251,6 @@ private fun OrderItem(
                         )
                     }
                 }
-            }
-
-            if (order.refKey.isNullOrBlank()) {
                 Button(modifier = Modifier.fillMaxWidth(),
                     onClick = { onPublishClick(order) }) {
                     Text(text = "Опубликовать")

@@ -9,7 +9,7 @@
     <string name="drafts">Черновики</string>
     <string name="history">Опубликованные</string>
     <string name="no_orders">Нет Заказов</string>
-    <string name="create_order">Создать заказа</string>
+    <string name="create_order">Создать заказ</string>
     <string name="creation_order">Создание заказа</string>
     <string name="edit_order">Редактирование заказ</string>
     <string name="customer">Заказчик</string>

@@ -271,7 +271,7 @@ fun GodInfoScreenContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
-                        text = "Текущий долг $historyName:"
+                        text = "Текущий долг:"
                     )
                     Text(
                         text = debtForCustomer.format("грн"),
@@ -282,9 +282,9 @@ fun GodInfoScreenContent(
 
             historyName?.let {
                 HorizontalDivider(thickness = 0.5.dp)
-                Text(text = "История покупок $historyName:")
+                Text(text = "История покупок для $historyName:")
                 if (orderHistory.isNullOrEmpty()) {
-                    Text(text = "Нет истории для $historyName:")
+                    Text(text = "Нет истории")
                 } else {
                     for ((date, god) in orderHistory) {
                         Row {

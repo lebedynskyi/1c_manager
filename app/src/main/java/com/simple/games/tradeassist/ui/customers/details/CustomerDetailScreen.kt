@@ -71,32 +71,32 @@ fun CustomerDetailScreenContent(
 
         Spacer(Modifier.size(32.dp))
 
-        HorizontalDivider()
-        Row(modifier = Modifier.padding(horizontal = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                text = "Увеличение долга: ",
-            )
-            Text(
-                text = viewState.debtEntity?.totalPlus.format("грн"),
-            )
-        }
-        HorizontalDivider()
-
-        Row(modifier = Modifier.padding(horizontal = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                text = "Уменьшение долга:"
-            )
-            Text(
-                text = viewState.debtEntity?.totalMinus.format("грн"),
-            )
-        }
-        HorizontalDivider()
+//        HorizontalDivider()
+//        Row(modifier = Modifier.padding(horizontal = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
+//            Text(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .weight(1f),
+//                text = "Увеличение долга: ",
+//            )
+//            Text(
+//                text = viewState.debtEntity?.totalPlus.format("грн"),
+//            )
+//        }
+//        HorizontalDivider()
+//
+//        Row(modifier = Modifier.padding(horizontal = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
+//            Text(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .weight(1f),
+//                text = "Уменьшение долга:"
+//            )
+//            Text(
+//                text = viewState.debtEntity?.totalMinus.format("грн"),
+//            )
+//        }
+//        HorizontalDivider()
 
         Row(modifier = Modifier.padding(horizontal = 12.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
